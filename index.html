@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <style>
+        body {
+            background-color: #f0f0f0; /* Cambia el color de fondo según desees */
+        }
+        .CodeMirror {
+            border: 1px solid #ced4da;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Compilador</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <button class="btn btn-primary me-2" id="saveFile">Guardar Archivo</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-success me-2" id="compileButton">Compilar</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-info me-2" id="reportButton">Reportes</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <br>
+    <div class="container text-center">
+        <div class="mb-3">
+            <label for="openFile" class="form-label">Elegir Archivos</label>
+            <input type="file" class="form-control" id="openFile" multiple>
+        </div>
+    </div>
+    <!-- Contenido Principal -->
+    <div class="container mt-4">
+        <div class="mb-3">
+            <label for="codeInput" class="form-label">Código Fuente</label>
+            <textarea id="codeInput" rows="10" placeholder="Escribe tu código aquí..."></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="compiledOutput" class="form-label">Salida Compilada</label>
+            <textarea id="compiledOutput" rows="10" placeholder="Salida compilada..." readonly></textarea>
+        </div>
+    </div>
+
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script> <!-- Modo para JavaScript -->
+    <script>
+        // Inicializar CodeMirror en los textareas
+        var codeInput = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
+            lineNumbers: true,
+            mode: "javascript", // Cambia el modo según el lenguaje que estás utilizando
+            theme: "default" // Puedes cambiar el tema si lo deseas
+        });
+
+        var compiledOutput = CodeMirror.fromTextArea(document.getElementById("compiledOutput"), {
+            lineNumbers: true,
+            mode: "javascript", // O el lenguaje de la salida compilada
+            theme: "default",
+            readOnly: true // Hacer que el textarea de salida sea solo de lectura
+        });
+
+        document.getElementById("openFile").addEventListener("change", function(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            const file = files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const content = e.target.result;
+                codeInput.setValue(content); // Cargar el contenido en el editor CodeMirror
+            };
+
+            reader.readAsText(file);
+        });
+
+        document.getElementById("compileButton").addEventListener("click", function() {
+            const code = codeInput.getValue();
+            // Aquí debes incluir la lógica para compilar el código.
+            // Por ejemplo, podrías enviar el código al servidor o procesarlo localmente.
+            // Aquí solo se muestra un mensaje de ejemplo.
+            const output = compileCode(code); // Supongamos que tienes una función compileCode()
+            compiledOutput.setValue(output); // Mostrar el resultado en el editor CodeMirror
+        });
+
+        function compileCode(code) {
+            // Aquí deberías implementar la lógica de compilación.
+            // Este es un ejemplo simple que solo devuelve el código recibido.
+            return `Salida compilada:\n\n${code}`;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
