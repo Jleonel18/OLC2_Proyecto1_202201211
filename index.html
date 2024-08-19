@@ -20,7 +20,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Compilador</a>
+            <a class="navbar-brand" href="#">OAKLAND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -28,9 +28,6 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <button class="btn btn-primary me-2" id="saveFile">Guardar Archivo</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-success me-2" id="compileButton">Compilar</button>
                     </li>
                     <li class="nav-item">
                         <button class="btn btn-info me-2" id="reportButton">Reportes</button>
@@ -41,15 +38,30 @@
     </nav>
     <br>
     <div class="container text-center">
-        <div class="mb-3">
-            <label for="openFile" class="form-label">Elegir Archivos</label>
-            <input type="file" class="form-control" id="openFile" multiple>
+        <div class="row">
+            <!-- Columna para elegir archivos -->
+            <div class="col">
+                <div class="mb-2">
+                    <label for="openFile" class="form-label">Elegir Archivos</label>
+                    <input type="file" class="form-control" id="openFile" multiple>
+                </div>
+            </div>
+    
+            <!-- Columna para el botón de compilar -->
+            <div class="col">
+                <div class="mb-2">
+                    <label for="compileButton" class="form-label">Presionar botón para Compilar</label>
+                    <button class="btn btn-success w-100" id="compileButton">Compilar</button>
+                </div>
+            </div>
         </div>
     </div>
+    
+    
     <!-- Contenido Principal -->
     <div class="container mt-4">
         <div class="mb-3">
-            <label for="codeInput" class="form-label">Código Fuente</label>
+            <label for="codeInput" class="form-label">Código Oakland</label>
             <textarea id="codeInput" rows="10" placeholder="Escribe tu código aquí..."></textarea>
         </div>
         <div class="mb-3">
