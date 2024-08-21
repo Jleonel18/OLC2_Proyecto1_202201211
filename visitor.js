@@ -27,6 +27,12 @@
 
  * @typedef {import('./nodos').ExpresionStmt} ExpresionStmt
 
+
+ * @typedef {import('./nodos').Asignacion} Asignacion
+
+
+ * @typedef {import('./nodos').Bloque} Bloque
+
  */
 
 
@@ -115,6 +121,24 @@ export class BaseVisitor {
      */
     visitExpresionStmt(node) {
         throw new Error('Metodo visitExpresionStmt no implementado');
+    }
+    
+
+    /**
+     * @param {Asignacion} node
+     * @returns {any}
+     */
+    visitAsignacion(node) {
+        throw new Error('Metodo visitAsignacion no implementado');
+    }
+    
+
+    /**
+     * @param {Bloque} node
+     * @returns {any}
+     */
+    visitBloque(node) {
+        throw new Error('Metodo visitBloque no implementado');
     }
     
 }

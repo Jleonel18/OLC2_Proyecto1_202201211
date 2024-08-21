@@ -3,10 +3,16 @@ import { BaseVisitor } from "./visitor.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
-    constructor() {
+
+    /**
+     * 
+     * @param {Entorno} padre 
+     */
+    constructor(padre = undefined) {
         super();
         this.entornoActual = new Entorno();
         this.salida = "";
+        this.padre = padre;
     }
 
     /**
@@ -92,6 +98,29 @@ export class InterpreterVisitor extends BaseVisitor{
      */
     visitExpresionStmt(node) {
         node.exp.accept(this);
+    }
+
+    /**
+    * @type {BaseVisitor['visitAsignacion']}
+    */
+    visitAsignacion(node) {
+        const valorA = node.exp.accept(this);
+        this.entornoActual.updateVariable(node.id, valorA);
+        
+        return valorA;
+    }
+
+    /**
+     * @type {BaseVisitor['visitBloque']}
+     */
+    visitBloque(node) {
+        const entornoAnterior = this.entornoActual;
+        this.entornoActual = new Entorno(entornoAnterior);
+
+        node.decl.forEach(decl => decl.accept(this));
+        this.entornoActual = entornoAnterior;
+
+
     }
 
 }

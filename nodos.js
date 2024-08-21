@@ -273,4 +273,62 @@ export class ExpresionStmt extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt }
+export class Asignacion extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador variable a asignar
+ * @param {Expresion} options.exp Expresion a asignar
+    */
+    constructor({ id, exp }) {
+        super();
+        
+        /**
+         * Identificador variable a asignar
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion a asignar
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAsignacion(this);
+    }
+}
+    
+export class Bloque extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion[]} options.decl Sentencias de bloque
+    */
+    constructor({ decl }) {
+        super();
+        
+        /**
+         * Sentencias de bloque
+         * @type {Expresion[]}
+        */
+        this.decl = decl;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitBloque(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque }
