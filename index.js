@@ -1,41 +1,19 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const openFileInput = document.getElementById("openFile");
-    const codeInput = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
-        lineNumbers: true,
-        mode: "javascript", 
-        theme: "default"
-    });
-    const compiledOutput = CodeMirror.fromTextArea(document.getElementById("compiledOutput"), {
-        lineNumbers: true,
-        mode: "javascript",
-        theme: "default",
-        readOnly: true
-    });
+import { parse } from './analizador.js'
+import { InterpreterVisitor } from './interprete.js'
 
-    openFileInput.addEventListener("change", function(event) {
-        const files = event.target.files;
-        if (files.length === 0) return;
+const editor = document.getElementById('codeInput')
+const btn = document.getElementById('compileButton')
+const salida = document.getElementById('compiledOutput')
 
-        const file = files[0];
-        const reader = new FileReader();
+btn.addEventListener('click', () => {
+    const codigoFuente = editor.value
+    const sentencias = parse(codigoFuente)
 
-        reader.onload = function(e) {
-            const content = e.target.result;
-            codeInput.setValue(content); 
-        };
+    const interprete = new InterpreterVisitor()
 
-        reader.readAsText(file);
-    });
+    console.log({ sentencias })
+    sentencias.forEach(sentencia => sentencia.accept(interprete))
 
-    // Función para compilar el código
-    document.getElementById("compileButton").addEventListener("click", function() {
-        //const code = codeInput.getValue();
-        //const output = compileCode(code);
-        //compiledOutput.setValue(output);
-    });
-
-    function compileCode(code) {
-        // Aquí deberías implementar la lógica de compilación.
-        // Se debe devolver algun return con el código compilado.
-    }
-});
+    console.log("Salida:", interprete.salida)
+    salida.textContent = interprete.salida
+})
