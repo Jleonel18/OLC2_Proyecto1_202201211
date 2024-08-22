@@ -405,4 +405,103 @@ export class While extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While }
+export class For extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.inic Inicializacion del for
+ * @param {Expresion} options.cond Condicion del for
+ * @param {Expresion} options.incremento Incremento del for
+ * @param {Expresion} options.stmt Sentencia del for
+    */
+    constructor({ inic, cond, incremento, stmt }) {
+        super();
+        
+        /**
+         * Inicializacion del for
+         * @type {Expresion}
+        */
+        this.inic = inic;
+
+
+        /**
+         * Condicion del for
+         * @type {Expresion}
+        */
+        this.cond = cond;
+
+
+        /**
+         * Incremento del for
+         * @type {Expresion}
+        */
+        this.incremento = incremento;
+
+
+        /**
+         * Sentencia del for
+         * @type {Expresion}
+        */
+        this.stmt = stmt;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitFor(this);
+    }
+}
+    
+export class Incremento extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador de la variable
+    */
+    constructor({ id }) {
+        super();
+        
+        /**
+         * Identificador de la variable
+         * @type {string}
+        */
+        this.id = id;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitIncremento(this);
+    }
+}
+    
+export class Decremento extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador de la variable
+    */
+    constructor({ id }) {
+        super();
+        
+        /**
+         * Identificador de la variable
+         * @type {string}
+        */
+        this.id = id;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDecremento(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }

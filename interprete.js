@@ -87,7 +87,28 @@ export class InterpreterVisitor extends BaseVisitor{
         const valorVariable = this.entornoActual.getVariable(nombreVariable)
         return valorVariable
     }
-    
+
+    /**
+     * @type {BaseVisitor['visitIncremento']}
+     */
+    visitIncremento(node){
+        const nombreVariable = node.id;
+        const valorVariable = this.entornoActual.getVariable(nombreVariable);
+        this.entornoActual.updateVariable(nombreVariable,( parseInt(valorVariable) + 1));
+        return parseInt(valorVariable + 1);
+    }
+
+    /**
+     * @type {BaseVisitor['visitDecremento']}
+     */
+    visitDecremento(node){
+            
+            const nombreVariable = node.id;
+            const valorVariable = this.entornoActual.getVariable(nombreVariable);
+            this.entornoActual.updateVariable(nombreVariable,( parseInt(valorVariable) - 1));
+            return parseInt(valorVariable - 1);
+    }
+
     /**
      * @type {BaseVisitor['visitPrint']}
      */
@@ -150,6 +171,23 @@ export class InterpreterVisitor extends BaseVisitor{
         while(node.cond.accept(this)) {
             node.stmt.accept(this);
         }
+    }
+
+    /**
+     * @type {BaseVisitor['visitFor']}
+     */
+    visitFor(node) {
+
+        const entornoAnterior = this.entornoActual;
+        this.entornoActual  = new Entorno(entornoAnterior);
+        node.inic.accept(this);
+
+        while(node.cond.accept(this)) {
+            node.stmt.accept(this);
+            node.incremento.accept(this);
+        }
+
+        this.entornoActual = entornoAnterior;
     }
 
 }

@@ -39,6 +39,15 @@
 
  * @typedef {import('./nodos').While} While
 
+
+ * @typedef {import('./nodos').For} For
+
+
+ * @typedef {import('./nodos').Incremento} Incremento
+
+
+ * @typedef {import('./nodos').Decremento} Decremento
+
  */
 
 
@@ -163,6 +172,33 @@ export class BaseVisitor {
      */
     visitWhile(node) {
         throw new Error('Metodo visitWhile no implementado');
+    }
+    
+
+    /**
+     * @param {For} node
+     * @returns {any}
+     */
+    visitFor(node) {
+        throw new Error('Metodo visitFor no implementado');
+    }
+    
+
+    /**
+     * @param {Incremento} node
+     * @returns {any}
+     */
+    visitIncremento(node) {
+        throw new Error('Metodo visitIncremento no implementado');
+    }
+    
+
+    /**
+     * @param {Decremento} node
+     * @returns {any}
+     */
+    visitDecremento(node) {
+        throw new Error('Metodo visitDecremento no implementado');
     }
     
 }

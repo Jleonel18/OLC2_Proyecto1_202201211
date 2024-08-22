@@ -13,7 +13,10 @@
       'asignacion': nodos.Asignacion,
       'bloque': nodos.Bloque,
       'if': nodos.If,
-      'while': nodos.While
+      'while': nodos.While,
+      'for': nodos.For,
+      'incremento': nodos.Incremento,
+      'decremento': nodos.Decremento
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -38,6 +41,7 @@ Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp })
     )? { return crearNodo('if', { cond, stmtT, stmtElse }) }
 
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
+    / "for" _ "(" _ inic: Declaracion _ cond: Expresion _ ";" _ incremento: Expresion _ ")" _ stmt:Stmt { return crearNodo('for', { inic, cond, incremento, stmt }) }
 
 Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
@@ -47,7 +51,7 @@ Asignacion = id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asign
           / Comparacion
 
 Comparacion = izq:Suma expansion:(
-              _ op:("<=") _ der:Suma { return { tipo: op, der } }
+              _ op:("<="/"<"/">="/">") _ der:Suma { return { tipo: op, der } }
             )* {
               return expansion.reduce(
                 (operacionAnterior, operacionActual) => {
@@ -83,7 +87,9 @@ Multiplicacion = izq:Unaria expansion:(
 }
 
 Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
-/ Numero
+          / id:Identificador"++" { return crearNodo('incremento', {id}) }
+          / id:Identificador"--" { return crearNodo('decremento', {id}) }
+          / Numero
 
 Numero = [0-9]+( "." [0-9]+ )? {return crearNodo('numero', { valor: parseFloat(text(), 10) })}
   / "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
