@@ -206,6 +206,9 @@ function peg$parse(input, options) {
   var peg$c26 = "\"";
   var peg$c27 = "'";
   var peg$c28 = ".";
+  var peg$c29 = "//";
+  var peg$c30 = "/*";
+  var peg$c31 = "*/";
 
   var peg$r0 = /^[a-zA-Z]/;
   var peg$r1 = /^[a-zA-Z0-9]/;
@@ -215,6 +218,7 @@ function peg$parse(input, options) {
   var peg$r5 = /^[^']/;
   var peg$r6 = /^[0-9]/;
   var peg$r7 = /^[ \t\n\r]/;
+  var peg$r8 = /^[^\n]/;
 
   var peg$e0 = peg$literalExpectation("=", false);
   var peg$e1 = peg$literalExpectation(";", false);
@@ -253,15 +257,20 @@ function peg$parse(input, options) {
   var peg$e34 = peg$classExpectation([["0", "9"]], false, false);
   var peg$e35 = peg$literalExpectation(".", false);
   var peg$e36 = peg$classExpectation([" ", "\t", "\n", "\r"], false, false);
+  var peg$e37 = peg$literalExpectation("//", false);
+  var peg$e38 = peg$classExpectation(["\n"], true, false);
+  var peg$e39 = peg$literalExpectation("/*", false);
+  var peg$e40 = peg$literalExpectation("*/", false);
+  var peg$e41 = peg$anyExpectation();
 
   var peg$f0 = function(dcl) { return dcl };
   var peg$f1 = function(dcl) { return dcl };
   var peg$f2 = function(stmt) { return stmt };
-  var peg$f3 = function(tipo, id, exp) { return crearNodo('declaracionVariable', { tipo,id, exp }) };
+  var peg$f3 = function(tipo, id, exp) { return crearNodo('declaracionVariable', { tipo, id, exp }) };
   var peg$f4 = function(exp) { return crearNodo('print', { exp }) };
   var peg$f5 = function(exp) { return crearNodo('expresionStmt', { exp }) };
-  var peg$f6 = function(decl) { return crearNodo('bloque', {decl}) };
-  var peg$f7 = function(cond, stmtT, stmtElse) {return stmtElse};
+  var peg$f6 = function(decl) { return crearNodo('bloque', { decl }) };
+  var peg$f7 = function(cond, stmtT, stmtElse) { return stmtElse };
   var peg$f8 = function(cond, stmtT, stmtElse) { return crearNodo('if', { cond, stmtT, stmtElse }) };
   var peg$f9 = function(cond, stmt) { return crearNodo('while', { cond, stmt }) };
   var peg$f10 = function(inic, cond, incremento, stmt) { return crearNodo('for', { inic, cond, incremento, stmt }) };
@@ -272,7 +281,7 @@ function peg$parse(input, options) {
               return expansion.reduce(
                 (operacionAnterior, operacionActual) => {
                   const { tipo, der } = operacionActual
-                  return crearNodo('binaria', { op:tipo, izq: operacionAnterior, der })
+                  return crearNodo('binaria', { op: tipo, izq: operacionAnterior, der })
                 },
                 izq
               )
@@ -282,7 +291,7 @@ function peg$parse(input, options) {
   return expansion.reduce(
     (operacionAnterior, operacionActual) => {
       const { tipo, der } = operacionActual
-      return crearNodo('binaria', { op:tipo, izq: operacionAnterior, der })
+      return crearNodo('binaria', { op: tipo, izq: operacionAnterior, der })
     },
     izq
   )
@@ -292,21 +301,27 @@ function peg$parse(input, options) {
     return expansion.reduce(
       (operacionAnterior, operacionActual) => {
         const { tipo, der } = operacionActual
-        return crearNodo('binaria', { op:tipo, izq: operacionAnterior, der })
+        return crearNodo('binaria', { op: tipo, izq: operacionAnterior, der })
       },
       izq
     )
 };
   var peg$f19 = function(num) { return crearNodo('unaria', { op: '-', exp: num }) };
-  var peg$f20 = function(id) { return crearNodo('incremento', {id}) };
-  var peg$f21 = function(id) { return crearNodo('decremento', {id}) };
+  var peg$f20 = function(id) { return crearNodo('incremento', { id }) };
+  var peg$f21 = function(id) { return crearNodo('decremento', { id }) };
   var peg$f22 = function() { return crearNodo('booleano', { valor: true }) };
   var peg$f23 = function() { return crearNodo('booleano', { valor: false }) };
-  var peg$f24 = function(chars) { return crearNodo('cadena', { valor: chars.join("") }) };
-  var peg$f25 = function(char) { return crearNodo('caracter', { valor: char }) };
-  var peg$f26 = function() {return crearNodo('numero', { valor: parseFloat(text(), 10) })};
+  var peg$f24 = function(chars) {
+  return crearNodo('cadena', { valor: chars.join("") });
+};
+  var peg$f25 = function(char) {
+  return crearNodo('caracter', { valor: char });
+};
+  var peg$f26 = function() { return crearNodo('numero', { valor: parseFloat(text(), 10) })};
   var peg$f27 = function(exp) { return crearNodo('agrupacion', { exp }) };
   var peg$f28 = function(id) { return crearNodo('referenciaVariable', { id }) };
+  var peg$f29 = function() { };
+  var peg$f30 = function() { };
   var peg$currPos = options.peg$currPos | 0;
   var peg$savedPos = peg$currPos;
   var peg$posDetailsCache = [{ line: 1, column: 1 }];
@@ -1654,15 +1669,8 @@ function peg$parse(input, options) {
     var s0, s1;
 
     s0 = [];
-    s1 = input.charAt(peg$currPos);
-    if (peg$r7.test(s1)) {
-      peg$currPos++;
-    } else {
-      s1 = peg$FAILED;
-      if (peg$silentFails === 0) { peg$fail(peg$e36); }
-    }
-    while (s1 !== peg$FAILED) {
-      s0.push(s1);
+    s1 = peg$parseComentario();
+    if (s1 === peg$FAILED) {
       s1 = input.charAt(peg$currPos);
       if (peg$r7.test(s1)) {
         peg$currPos++;
@@ -1671,12 +1679,171 @@ function peg$parse(input, options) {
         if (peg$silentFails === 0) { peg$fail(peg$e36); }
       }
     }
+    while (s1 !== peg$FAILED) {
+      s0.push(s1);
+      s1 = peg$parseComentario();
+      if (s1 === peg$FAILED) {
+        s1 = input.charAt(peg$currPos);
+        if (peg$r7.test(s1)) {
+          peg$currPos++;
+        } else {
+          s1 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$e36); }
+        }
+      }
+    }
+
+    return s0;
+  }
+
+  function peg$parseComentario() {
+    var s0, s1, s2, s3, s4, s5;
+
+    s0 = peg$currPos;
+    if (input.substr(peg$currPos, 2) === peg$c29) {
+      s1 = peg$c29;
+      peg$currPos += 2;
+    } else {
+      s1 = peg$FAILED;
+      if (peg$silentFails === 0) { peg$fail(peg$e37); }
+    }
+    if (s1 !== peg$FAILED) {
+      s2 = [];
+      s3 = input.charAt(peg$currPos);
+      if (peg$r8.test(s3)) {
+        peg$currPos++;
+      } else {
+        s3 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$e38); }
+      }
+      while (s3 !== peg$FAILED) {
+        s2.push(s3);
+        s3 = input.charAt(peg$currPos);
+        if (peg$r8.test(s3)) {
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$e38); }
+        }
+      }
+      peg$savedPos = s0;
+      s0 = peg$f29();
+    } else {
+      peg$currPos = s0;
+      s0 = peg$FAILED;
+    }
+    if (s0 === peg$FAILED) {
+      s0 = peg$currPos;
+      if (input.substr(peg$currPos, 2) === peg$c30) {
+        s1 = peg$c30;
+        peg$currPos += 2;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$e39); }
+      }
+      if (s1 !== peg$FAILED) {
+        s2 = [];
+        s3 = peg$currPos;
+        s4 = peg$currPos;
+        peg$silentFails++;
+        if (input.substr(peg$currPos, 2) === peg$c31) {
+          s5 = peg$c31;
+          peg$currPos += 2;
+        } else {
+          s5 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$e40); }
+        }
+        peg$silentFails--;
+        if (s5 === peg$FAILED) {
+          s4 = undefined;
+        } else {
+          peg$currPos = s4;
+          s4 = peg$FAILED;
+        }
+        if (s4 !== peg$FAILED) {
+          if (input.length > peg$currPos) {
+            s5 = input.charAt(peg$currPos);
+            peg$currPos++;
+          } else {
+            s5 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$e41); }
+          }
+          if (s5 !== peg$FAILED) {
+            s4 = [s4, s5];
+            s3 = s4;
+          } else {
+            peg$currPos = s3;
+            s3 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s3;
+          s3 = peg$FAILED;
+        }
+        while (s3 !== peg$FAILED) {
+          s2.push(s3);
+          s3 = peg$currPos;
+          s4 = peg$currPos;
+          peg$silentFails++;
+          if (input.substr(peg$currPos, 2) === peg$c31) {
+            s5 = peg$c31;
+            peg$currPos += 2;
+          } else {
+            s5 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$e40); }
+          }
+          peg$silentFails--;
+          if (s5 === peg$FAILED) {
+            s4 = undefined;
+          } else {
+            peg$currPos = s4;
+            s4 = peg$FAILED;
+          }
+          if (s4 !== peg$FAILED) {
+            if (input.length > peg$currPos) {
+              s5 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s5 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$e41); }
+            }
+            if (s5 !== peg$FAILED) {
+              s4 = [s4, s5];
+              s3 = s4;
+            } else {
+              peg$currPos = s3;
+              s3 = peg$FAILED;
+            }
+          } else {
+            peg$currPos = s3;
+            s3 = peg$FAILED;
+          }
+        }
+        if (input.substr(peg$currPos, 2) === peg$c31) {
+          s3 = peg$c31;
+          peg$currPos += 2;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$e40); }
+        }
+        if (s3 !== peg$FAILED) {
+          peg$savedPos = s0;
+          s0 = peg$f30();
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$FAILED;
+      }
+    }
 
     return s0;
   }
 
 
-  const crearNodo = (tipoNodo, props) =>{
+  // Función para crear nodos en el árbol AST
+  function crearNodo(tipoNodo, props) {
     const tipos = {
       'numero': nodos.Numero,
       'agrupacion': nodos.Agrupacion,
@@ -1696,11 +1863,11 @@ function peg$parse(input, options) {
       'cadena': nodos.Cadena,
       'caracter': nodos.Caracter,
       'booleano': nodos.Booleano
-    }
+    };
 
-    const nodo = new tipos[tipoNodo](props)
-    nodo.location = location()
-    return nodo
+    const nodo = new tipos[tipoNodo](props);
+    nodo.location = location();
+    return nodo;
   }
 
   peg$result = peg$startRuleFunction();

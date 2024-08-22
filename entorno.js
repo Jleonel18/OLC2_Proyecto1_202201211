@@ -25,6 +25,7 @@ export class Entorno {
         const valorAct = this.valores[nombre];
 
         if(valorAct != undefined) {
+            //console.log("el tipo de la variable:",nombre,"es:",typeof valorAct, "y el valor es:",valorAct)
             return valorAct;
         }
 

@@ -97,8 +97,8 @@ export class InterpreterVisitor extends BaseVisitor{
         const nombreVariable = node.id;
         const valorVariable = node.exp.accept(this);
     
-        console.log("el tipo de dato es:", node.tipo);
-        console.log("El tipo de dato de la variable es:", typeof valorVariable);
+        //console.log("el tipo de dato es:", node.tipo);
+        //console.log("El tipo de dato de la variable es:", typeof valorVariable);
     
         switch (node.tipo) {
             case "int":
@@ -150,6 +150,7 @@ export class InterpreterVisitor extends BaseVisitor{
     visitReferenciaVariable(node) {
         const nombreVariable = node.id
         const valorVariable = this.entornoActual.getVariable(nombreVariable)
+        //console.log("El valor de la variable referenciada es:",typeof valorVariable)
         return valorVariable
     }
 
@@ -194,6 +195,8 @@ export class InterpreterVisitor extends BaseVisitor{
     */
     visitAsignacion(node) {
         const valorA = node.exp.accept(this);
+        //console.log("el valor de la asignacion es:", typeof valorA);
+        //console.log("el tipo de variable es:", typeof node.id);
         this.entornoActual.updateVariable(node.id, valorA);
         
         return valorA;
