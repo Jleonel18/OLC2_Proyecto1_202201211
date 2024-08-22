@@ -38,6 +38,11 @@ export class InterpreterVisitor extends BaseVisitor{
             case '>': return izq > der; 
             case '<=': return izq <= der;
             case '>=': return izq >= der;
+            case '%': return izq % der;
+            case '==': return izq === der;
+            case '!=': return izq !== der;
+            case '&&': return izq && der;
+            case '||': return izq || der;
             default: throw new Error(`Operador desconocido: ${node.operador}`);
         }
     }
@@ -50,6 +55,8 @@ export class InterpreterVisitor extends BaseVisitor{
         switch(node.op) {
             case '-': 
                 return -exp;
+            case '!':
+                return !exp;
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }
@@ -141,7 +148,7 @@ export class InterpreterVisitor extends BaseVisitor{
                 break;
         }
     
-        this.entornoActual.setVariable(nombreVariable, valorVariable);
+        this.entornoActual.setVariable(node.tipo,nombreVariable, valorVariable);
     }
     
     /**
@@ -150,7 +157,7 @@ export class InterpreterVisitor extends BaseVisitor{
     visitReferenciaVariable(node) {
         const nombreVariable = node.id
         const valorVariable = this.entornoActual.getVariable(nombreVariable)
-        //console.log("El valor de la variable referenciada es:",typeof valorVariable)
+        
         return valorVariable
     }
 
@@ -190,17 +197,50 @@ export class InterpreterVisitor extends BaseVisitor{
         node.exp.accept(this);
     }
 
-    /**
-    * @type {BaseVisitor['visitAsignacion']}
-    */
-    visitAsignacion(node) {
-        const valorA = node.exp.accept(this);
-        //console.log("el valor de la asignacion es:", typeof valorA);
-        //console.log("el tipo de variable es:", typeof node.id);
-        this.entornoActual.updateVariable(node.id, valorA);
-        
-        return valorA;
+/**
+* @type {BaseVisitor['visitAsignacion']}
+*/
+visitAsignacion(node) {
+    const valorA = node.exp.accept(this);
+    const tipoVariable = this.entornoActual.getTipoVariable(node.id);
+    //console.log("Tipo de variable: ", tipoVariable);
+    //console.log("Valor de la variable: ", valorA);
+    
+    switch(tipoVariable) {
+        case 'int':
+            if (typeof valorA !== 'number' || !Number.isInteger(valorA)) {
+                throw new Error(`El valor asignado a la variable ${node.id} no es de tipo int`);
+            }
+            break;
+        case 'float':
+            if (typeof valorA !== 'number') {
+                throw new Error(`El valor asignado a la variable ${node.id} no es de tipo float`);
+            }
+            break;
+        case 'string':
+            if (typeof valorA !== 'string') {
+                throw new Error(`El valor asignado a la variable ${node.id} no es de tipo string`);
+            }
+            break;
+        case 'char':
+            if (typeof valorA !== 'string' || valorA.length !== 1) {
+                throw new Error(`El valor asignado a la variable ${node.id} no es de tipo char`);
+            }
+            break;
+        case 'bool':
+            if (typeof valorA !== 'boolean') {
+                throw new Error(`El valor asignado a la variable ${node.id} no es de tipo bool`);
+            }
+            break;
+        default:
+            throw new Error(`Tipo de dato desconocido: ${tipoVariable}`);
     }
+
+    this.entornoActual.updateVariable(node.id, valorA);
+    
+    return valorA;
+}
+
 
     /**
      * @type {BaseVisitor['visitBloque']}

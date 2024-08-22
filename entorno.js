@@ -9,13 +9,13 @@ export class Entorno {
      * @param {string} nombre
      * @param {any} valor
      */
-    setVariable(nombre, valor) {
+    setVariable(tipo, nombre, valor) {
 
         if(this.valores[nombre] != undefined) {
             throw new Error(`Variable ${nombre} ya definida`)
         }
 
-        this.valores[nombre] = valor
+        this.valores[nombre] = {valor,tipo}
     }
 
     /**
@@ -25,8 +25,7 @@ export class Entorno {
         const valorAct = this.valores[nombre];
 
         if(valorAct != undefined) {
-            //console.log("el tipo de la variable:",nombre,"es:",typeof valorAct, "y el valor es:",valorAct)
-            return valorAct;
+            return valorAct.valor;
         }
 
         if(!valorAct && this.padre) {
@@ -38,13 +37,31 @@ export class Entorno {
 
     /**
      * @param {string} nombre
+     * @returns {string} tipo de la variable
+     */
+    getTipoVariable(nombre) {
+        const valorAct = this.valores[nombre];
+
+        if (valorAct !== undefined) {
+            return valorAct.tipo;
+        }
+
+        if (!valorAct && this.padre) {
+            return this.padre.getTipoVariable(nombre);
+        }
+
+        throw new Error(`Tipo de la variable ${nombre} no definido`);
+    }
+
+    /**
+     * @param {string} nombre
      * @param {any} valor
      */
     updateVariable(nombre, valor) {
         const valorAct = this.valores[nombre];
 
         if(valorAct != undefined) {
-            this.valores[nombre] = valor;
+            this.valores[nombre].valor = valor;
             return;
         }
 

@@ -52,7 +52,31 @@ Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 Expresion = Asignacion
 
 Asignacion = id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
-          / Comparacion
+          / Logico
+
+Logico = izq:Igualacion expansion:(
+          _ op:("&&" / "||") _ der:Igualacion { return { tipo: op, der } }
+        )* {
+          return expansion.reduce(
+            (operacionAnterior, operacionActual) => {
+              const { tipo, der } = operacionActual
+              return crearNodo('binaria', { op: tipo, izq: operacionAnterior, der })
+            },
+            izq
+          )
+        }
+
+Igualacion = izq:Comparacion expansion:(
+              _ op:("!=" / "==") _ der:Comparacion { return { tipo: op, der } }
+            )* {
+              return expansion.reduce(
+                (operacionAnterior, operacionActual) => {
+                  const { tipo, der } = operacionActual
+                  return crearNodo('binaria', { op: tipo, izq: operacionAnterior, der })
+                },
+                izq
+              )
+            }
 
 Comparacion = izq:Suma expansion:(
               _ op:("<=" / "<" / ">=" / ">") _ der:Suma { return { tipo: op, der } }
@@ -79,7 +103,7 @@ Suma = izq:Multiplicacion expansion:(
 }
 
 Multiplicacion = izq:Unaria expansion:(
-  _ op:("*" / "/") _ der:Unaria { return { tipo: op, der } }
+  _ op:("*" / "/"/"%") _ der:Unaria { return { tipo: op, der } }
 )* {
     return expansion.reduce(
       (operacionAnterior, operacionActual) => {
@@ -91,6 +115,7 @@ Multiplicacion = izq:Unaria expansion:(
 }
 
 Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
+          / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
           / Booleano
           / Cadena
           / Caracter
