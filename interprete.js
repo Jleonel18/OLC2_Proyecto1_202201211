@@ -35,6 +35,10 @@ export class InterpreterVisitor extends BaseVisitor{
             case '-': return izq - der;
             case '*': return izq * der;
             case '/': return izq / der;
+            case '<': return izq < der;
+            case '>': return izq > der; 
+            case '<=': return izq <= der;
+            case '>=': return izq >= der;
             default: throw new Error(`Operador desconocido: ${node.operador}`);
         }
     }
@@ -121,6 +125,32 @@ export class InterpreterVisitor extends BaseVisitor{
         this.entornoActual = entornoAnterior;
 
 
+    }
+
+    /**
+     * @type {BaseVisitor['visitIf']}
+     */
+    visitIf(node) {
+        const condicion = node.cond.accept(this);
+        console.log("Condicion: ", condicion);
+        
+        if(condicion){
+            node.stmtT.accept(this);
+            return
+        }
+
+        if(node.stmtElse) {
+            node.stmtElse.accept(this);
+        }
+    }
+
+    /**
+     * @type {BaseVisitor['visitWhile']}
+     */
+    visitWhile(node) {
+        while(node.cond.accept(this)) {
+            node.stmt.accept(this);
+        }
     }
 
 }

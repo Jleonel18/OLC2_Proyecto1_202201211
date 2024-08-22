@@ -11,7 +11,9 @@
       'print': nodos.Print,
       'expresionStmt': nodos.ExpresionStmt,
       'asignacion': nodos.Asignacion,
-      'bloque': nodos.Bloque
+      'bloque': nodos.Bloque,
+      'if': nodos.If,
+      'while': nodos.While
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -29,14 +31,32 @@ VarDcl = "var" _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo
 
 Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
-    / "{" _ decl:Declaracion* _ "}" { return decl }
+    / "{" _ decl:Declaracion* _ "}" { return crearNodo('bloque',{decl}) }
+    / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
+    stmtElse:( 
+      _ "else" _ stmtElse:Stmt {return stmtElse}
+    )? { return crearNodo('if', { cond, stmtT, stmtElse }) }
+
+    / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
 
 Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
 Expresion = Asignacion
 
 Asignacion = id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
-          / Suma
+          / Comparacion
+
+Comparacion = izq:Suma expansion:(
+              _ op:("<" / "<=" / ">" / ">=") _ der:Suma { return { tipo: op, der } }
+            )* {
+              return expansion.reduce(
+                (operacionAnterior, operacionActual) => {
+                  const { tipo, der } = operacionActual
+                  return crearNodo('binaria', { op:tipo, izq: operacionAnterior, der })
+                },
+                izq
+              )
+            }
 
 Suma = izq:Multiplicacion expansion:(
   _ op:("+" / "-") _ der:Multiplicacion { return { tipo: op, der } }

@@ -33,6 +33,12 @@
 
  * @typedef {import('./nodos').Bloque} Bloque
 
+
+ * @typedef {import('./nodos').If} If
+
+
+ * @typedef {import('./nodos').While} While
+
  */
 
 
@@ -139,6 +145,24 @@ export class BaseVisitor {
      */
     visitBloque(node) {
         throw new Error('Metodo visitBloque no implementado');
+    }
+    
+
+    /**
+     * @param {If} node
+     * @returns {any}
+     */
+    visitIf(node) {
+        throw new Error('Metodo visitIf no implementado');
+    }
+    
+
+    /**
+     * @param {While} node
+     * @returns {any}
+     */
+    visitWhile(node) {
+        throw new Error('Metodo visitWhile no implementado');
     }
     
 }
