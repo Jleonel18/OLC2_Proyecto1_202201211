@@ -16,6 +16,15 @@
  * @typedef {import('./nodos').Numero} Numero
 
 
+ * @typedef {import('./nodos').Cadena} Cadena
+
+
+ * @typedef {import('./nodos').Caracter} Caracter
+
+
+ * @typedef {import('./nodos').Booleano} Booleano
+
+
  * @typedef {import('./nodos').DeclaracionVariable} DeclaracionVariable
 
 
@@ -100,6 +109,33 @@ export class BaseVisitor {
      */
     visitNumero(node) {
         throw new Error('Metodo visitNumero no implementado');
+    }
+    
+
+    /**
+     * @param {Cadena} node
+     * @returns {any}
+     */
+    visitCadena(node) {
+        throw new Error('Metodo visitCadena no implementado');
+    }
+    
+
+    /**
+     * @param {Caracter} node
+     * @returns {any}
+     */
+    visitCaracter(node) {
+        throw new Error('Metodo visitCaracter no implementado');
+    }
+    
+
+    /**
+     * @param {Booleano} node
+     * @returns {any}
+     */
+    visitBooleano(node) {
+        throw new Error('Metodo visitBooleano no implementado');
     }
     
 

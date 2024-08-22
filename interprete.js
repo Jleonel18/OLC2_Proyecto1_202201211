@@ -70,12 +70,77 @@ export class InterpreterVisitor extends BaseVisitor{
     }
     
     /**
+     * @type {BaseVisitor['visitCadena']}
+     */
+    visitCadena(node) {
+        return node.valor;
+    }
+
+    /**
+     * @type {BaseVisitor['visitCaracter']}
+     */
+    visitCaracter(node) {
+        return node.valor;
+    }
+
+    /**
+     * @type {BaseVisitor['visitBooleano']}
+     */
+    visitBooleano(node) {
+        return node.valor;
+    }
+
+    /**
     *@type {BaseVisitor['visitDeclaracionVariable']}
     */
     visitDeclaracionVariable(node) {
-        const nombreVariable  = node.id;
+        const nombreVariable = node.id;
         const valorVariable = node.exp.accept(this);
-
+    
+        console.log("el tipo de dato es:", node.tipo);
+        console.log("El tipo de dato de la variable es:", typeof valorVariable);
+    
+        switch (node.tipo) {
+            case "int":
+                const valorConvertidoInt = parseInt(valorVariable, 10);
+                if (!Number.isInteger(valorConvertidoInt)) {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo int`);
+                }
+                if (valorConvertidoInt.toString() !== valorVariable.toString()) {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo int`);
+                }
+                break;
+    
+            case "float":
+                const valorConvertidoFloat = parseFloat(valorVariable);
+                if (isNaN(valorConvertidoFloat)) {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo float`);
+                }
+                // Verifica que el valor convertido sea numérico y mantenga la precisión
+                if (valorConvertidoFloat.toString() !== valorVariable.toString()) {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo float`);
+                }
+                break;
+    
+            case "string":
+                if (typeof valorVariable !== 'string') {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo string`);
+                }
+                break;
+    
+            case "char":
+                if (typeof valorVariable !== 'string' || valorVariable.length !== 1) {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo char`);
+                }
+                break;
+    
+            case "bool":
+                if (typeof valorVariable !== 'boolean') {
+                    throw new Error(`El valor asignado a la variable ${nombreVariable} no es de tipo boolean`);
+                }
+                break;
+        }
+    
         this.entornoActual.setVariable(nombreVariable, valorVariable);
     }
     

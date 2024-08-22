@@ -165,14 +165,90 @@ export class Numero extends Expresion {
     }
 }
     
+export class Cadena extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {String} options.valor Valor de la cadena
+    */
+    constructor({ valor }) {
+        super();
+        
+        /**
+         * Valor de la cadena
+         * @type {String}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitCadena(this);
+    }
+}
+    
+export class Caracter extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Shar} options.valor Valor del caracter
+    */
+    constructor({ valor }) {
+        super();
+        
+        /**
+         * Valor del caracter
+         * @type {Shar}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitCaracter(this);
+    }
+}
+    
+export class Booleano extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {boolean} options.valor Valor del booleano
+    */
+    constructor({ valor }) {
+        super();
+        
+        /**
+         * Valor del booleano
+         * @type {boolean}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitBooleano(this);
+    }
+}
+    
 export class DeclaracionVariable extends Expresion {
 
     /**
     * @param {Object} options
     * @param {string} options.id Identificador de la variable
  * @param {Expresion} options.exp Expresion de la variable
+ * @param {string} options.tipo Tipo de la variable
     */
-    constructor({ id, exp }) {
+    constructor({ id, exp, tipo }) {
         super();
         
         /**
@@ -187,6 +263,13 @@ export class DeclaracionVariable extends Expresion {
          * @type {Expresion}
         */
         this.exp = exp;
+
+
+        /**
+         * Tipo de la variable
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -504,4 +587,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Caracter, Booleano, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }

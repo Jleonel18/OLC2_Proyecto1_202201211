@@ -16,7 +16,10 @@
       'while': nodos.While,
       'for': nodos.For,
       'incremento': nodos.Incremento,
-      'decremento': nodos.Decremento
+      'decremento': nodos.Decremento,
+      'cadena': nodos.Cadena,
+      'caracter': nodos.Caracter,
+      'booleano': nodos.Booleano
     }
 
     const nodo = new tipos[tipoNodo](props)
@@ -30,7 +33,9 @@ programa = _ dcl:Declaracion* _ { return dcl }
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
 
-VarDcl = "var" _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
+VarDcl = tipo:TipoDato _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { tipo,id, exp }) }
+
+TipoDato = "int" / "float" / "string" / "bool" / "var" / "char"
 
 Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
@@ -87,9 +92,19 @@ Multiplicacion = izq:Unaria expansion:(
 }
 
 Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
+          / Booleano
+          / Cadena
+          / Caracter
           / id:Identificador"++" { return crearNodo('incremento', {id}) }
           / id:Identificador"--" { return crearNodo('decremento', {id}) }
           / Numero
+
+
+Booleano = "true" { return crearNodo('booleano', { valor: true }) }
+          / "false" { return crearNodo('booleano', { valor: false }) }
+
+Cadena = "\"" chars:([^"]*) "\"" { return crearNodo('cadena', { valor: chars.join("") }) }
+Caracter = "'" char:[^'] "'" { return crearNodo('caracter', { valor: char }) }
 
 Numero = [0-9]+( "." [0-9]+ )? {return crearNodo('numero', { valor: parseFloat(text(), 10) })}
   / "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
