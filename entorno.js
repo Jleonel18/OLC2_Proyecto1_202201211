@@ -1,7 +1,8 @@
 
 export class Entorno {
-    constructor() {
+    constructor(padre = undefined) {
         this.valores = {}
+        this.padre = padre
     }
 
     /**
@@ -10,10 +11,10 @@ export class Entorno {
      */
     setVariable(nombre, valor) {
 
-        // Si ya existe la variable, lanzar error
-        /*if(this.valores[nombre]) {
+        if(this.valores[nombre] != undefined) {
             throw new Error(`Variable ${nombre} ya definida`)
-        }*/
+        }
+
         this.valores[nombre] = valor
     }
 
@@ -23,7 +24,7 @@ export class Entorno {
     getVariable(nombre) {
         const valorAct = this.valores[nombre];
 
-        if(valorAct) {
+        if(valorAct != undefined) {
             return valorAct;
         }
 
@@ -41,7 +42,7 @@ export class Entorno {
     updateVariable(nombre, valor) {
         const valorAct = this.valores[nombre];
 
-        if(valorAct) {
+        if(valorAct != undefined) {
             this.valores[nombre] = valor;
             return;
         }

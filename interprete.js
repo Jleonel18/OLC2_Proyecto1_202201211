@@ -8,11 +8,10 @@ export class InterpreterVisitor extends BaseVisitor{
      * 
      * @param {Entorno} padre 
      */
-    constructor(padre = undefined) {
+    constructor() {
         super();
         this.entornoActual = new Entorno();
         this.salida = "";
-        this.padre = padre;
     }
 
     /**

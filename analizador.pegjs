@@ -29,9 +29,9 @@ Declaracion = dcl:VarDcl _ { return dcl }
 
 VarDcl = "var" _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
 
-Stmt = "System.out.println(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
+Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
-    / "{" _ decl:Declaracion* _ "}" { return crearNodo('bloque',{decl}) }
+    / "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', {decl}) }
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
     stmtElse:( 
       _ "else" _ stmtElse:Stmt {return stmtElse}
@@ -47,7 +47,7 @@ Asignacion = id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asign
           / Comparacion
 
 Comparacion = izq:Suma expansion:(
-              _ op:("<" / "<=" / ">" / ">=") _ der:Suma { return { tipo: op, der } }
+              _ op:("<=") _ der:Suma { return { tipo: op, der } }
             )* {
               return expansion.reduce(
                 (operacionAnterior, operacionActual) => {
