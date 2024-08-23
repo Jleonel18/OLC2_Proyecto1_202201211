@@ -25,7 +25,7 @@ export class Entorno {
         const valorAct = this.valores[nombre];
 
         if(valorAct != undefined) {
-            return valorAct.valor;
+            return valorAct;
         }
 
         if(!valorAct && this.padre) {
@@ -35,43 +35,53 @@ export class Entorno {
         throw new Error(`Variable ${nombre} no definida`)
     }
 
-    /**
-     * @param {string} nombre
-     * @returns {string} tipo de la variable
-     */
-    getTipoVariable(nombre) {
-        const valorAct = this.valores[nombre];
+/**
+ * @param {string} nombre
+ * @param {any} valor
+ */
+updateVariable(nombre, valor) {
+    const valorAct = this.valores[nombre];
 
-        if (valorAct !== undefined) {
-            return valorAct.tipo;
+    console.log("El tipo de la variable es: ", valorAct.tipo);
+    console.log("El tipo del valor es: ", valor.tipo);
+
+    if (valorAct != undefined) {
+        // Verificación específica de tipos
+        if (valorAct.tipo === "string" && valor.tipo !== "string") {
+            throw new Error(`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`);
         }
 
-        if (!valorAct && this.padre) {
-            return this.padre.getTipoVariable(nombre);
+        if (valorAct.tipo === "char" && valor.tipo !== "char") {
+            throw new Error(`El tipo de la variable ${nombre} es 'char' y no coincide con el tipo del valor proporcionado.`);
         }
 
-        throw new Error(`Tipo de la variable ${nombre} no definido`);
+        if (valorAct.tipo === "int" && valor.tipo !== "int") {
+            throw new Error(`El tipo de la variable ${nombre} es 'int' y solo puede aceptar valores de tipo 'int'.`);
+        }
+
+        if (valorAct.tipo === "float" && (valor.tipo !== "float" && valor.tipo !== "int")) {
+            throw new Error(`El tipo de la variable ${nombre} es 'float' y solo puede aceptar valores de tipo 'float' o 'int'.`);
+        }
+
+        if (valorAct.tipo === "boolean" && valor.tipo !== "boolean") {
+            throw new Error(`El tipo de la variable ${nombre} es 'boolean' y no coincide con el tipo del valor proporcionado.`);
+        }
+
+        // Asignar el valor si las condiciones se cumplen
+        this.valores[nombre].valor = valor.valor;
+        this.valores[nombre].tipo = valor.tipo; // Actualizar tipo si hay conversión implícita
+        return;
     }
 
-    /**
-     * @param {string} nombre
-     * @param {any} valor
-     */
-    updateVariable(nombre, valor) {
-        const valorAct = this.valores[nombre];
-
-
-        if(valorAct != undefined) {
-            this.valores[nombre].valor = valor;
-            return;
-        }
-
-        if(!valorAct && this.padre) {
-            this.padre.updateVariable(nombre, valor);
-            return;
-        }
-
-        throw new Error(`Variable ${nombre} no definida`)
+    // Si no se encuentra en el entorno actual, buscar en el entorno padre
+    if (!valorAct && this.padre) {
+        this.padre.updateVariable(nombre, valor);
+        return;
     }
+
+    throw new Error(`Variable ${nombre} no definida`);
+}
+
+
 
 }

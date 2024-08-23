@@ -140,20 +140,28 @@ export class Agrupacion extends Expresion {
     }
 }
     
-export class Numero extends Expresion {
+export class Primitivo extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {number} options.valor Valor del numero
+    * @param {any} options.valor Valor primitivo
+ * @param {string} options.tipo Tipo del valor primitivo
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
-         * Valor del numero
-         * @type {number}
+         * Valor primitivo
+         * @type {any}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo del valor primitivo
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -161,82 +169,7 @@ export class Numero extends Expresion {
      * @param {BaseVisitor} visitor
      */
     accept(visitor) {
-        return visitor.visitNumero(this);
-    }
-}
-    
-export class Cadena extends Expresion {
-
-    /**
-    * @param {Object} options
-    * @param {String} options.valor Valor de la cadena
-    */
-    constructor({ valor }) {
-        super();
-        
-        /**
-         * Valor de la cadena
-         * @type {String}
-        */
-        this.valor = valor;
-
-    }
-
-    /**
-     * @param {BaseVisitor} visitor
-     */
-    accept(visitor) {
-        return visitor.visitCadena(this);
-    }
-}
-    
-export class Caracter extends Expresion {
-
-    /**
-    * @param {Object} options
-    * @param {Shar} options.valor Valor del caracter
-    */
-    constructor({ valor }) {
-        super();
-        
-        /**
-         * Valor del caracter
-         * @type {Shar}
-        */
-        this.valor = valor;
-
-    }
-
-    /**
-     * @param {BaseVisitor} visitor
-     */
-    accept(visitor) {
-        return visitor.visitCaracter(this);
-    }
-}
-    
-export class Booleano extends Expresion {
-
-    /**
-    * @param {Object} options
-    * @param {boolean} options.valor Valor del booleano
-    */
-    constructor({ valor }) {
-        super();
-        
-        /**
-         * Valor del booleano
-         * @type {boolean}
-        */
-        this.valor = valor;
-
-    }
-
-    /**
-     * @param {BaseVisitor} visitor
-     */
-    accept(visitor) {
-        return visitor.visitBooleano(this);
+        return visitor.visitPrimitivo(this);
     }
 }
     
@@ -278,6 +211,47 @@ export class DeclaracionVariable extends Expresion {
      */
     accept(visitor) {
         return visitor.visitDeclaracionVariable(this);
+    }
+}
+    
+export class TipoVariable extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la variable
+ * @param {string} options.id Identificador de la variable
+ * @param {Expresion|undefined} options.exp Expresion de la variable
+    */
+    constructor({ tipo, id, exp }) {
+        super();
+        
+        /**
+         * Tipo de la variable
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la variable
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion de la variable
+         * @type {Expresion|undefined}
+        */
+        this.exp = exp;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitTipoVariable(this);
     }
 }
     
@@ -595,4 +569,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Caracter, Booleano, DeclaracionVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }

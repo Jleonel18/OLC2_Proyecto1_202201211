@@ -13,19 +13,13 @@
  * @typedef {import('./nodos').Agrupacion} Agrupacion
 
 
- * @typedef {import('./nodos').Numero} Numero
-
-
- * @typedef {import('./nodos').Cadena} Cadena
-
-
- * @typedef {import('./nodos').Caracter} Caracter
-
-
- * @typedef {import('./nodos').Booleano} Booleano
+ * @typedef {import('./nodos').Primitivo} Primitivo
 
 
  * @typedef {import('./nodos').DeclaracionVariable} DeclaracionVariable
+
+
+ * @typedef {import('./nodos').TipoVariable} TipoVariable
 
 
  * @typedef {import('./nodos').ReferenciaVariable} ReferenciaVariable
@@ -104,38 +98,11 @@ export class BaseVisitor {
     
 
     /**
-     * @param {Numero} node
+     * @param {Primitivo} node
      * @returns {any}
      */
-    visitNumero(node) {
-        throw new Error('Metodo visitNumero no implementado');
-    }
-    
-
-    /**
-     * @param {Cadena} node
-     * @returns {any}
-     */
-    visitCadena(node) {
-        throw new Error('Metodo visitCadena no implementado');
-    }
-    
-
-    /**
-     * @param {Caracter} node
-     * @returns {any}
-     */
-    visitCaracter(node) {
-        throw new Error('Metodo visitCaracter no implementado');
-    }
-    
-
-    /**
-     * @param {Booleano} node
-     * @returns {any}
-     */
-    visitBooleano(node) {
-        throw new Error('Metodo visitBooleano no implementado');
+    visitPrimitivo(node) {
+        throw new Error('Metodo visitPrimitivo no implementado');
     }
     
 
@@ -145,6 +112,15 @@ export class BaseVisitor {
      */
     visitDeclaracionVariable(node) {
         throw new Error('Metodo visitDeclaracionVariable no implementado');
+    }
+    
+
+    /**
+     * @param {TipoVariable} node
+     * @returns {any}
+     */
+    visitTipoVariable(node) {
+        throw new Error('Metodo visitTipoVariable no implementado');
     }
     
 

@@ -1,13 +1,13 @@
 {
   // Función para crear nodos en el árbol AST
-  function crearNodo(tipoNodo, props) {
+  const  crearNodo = (tipoNodo, props) => {
     const tipos = {
-      'numero': nodos.Numero,
       'agrupacion': nodos.Agrupacion,
       'binaria': nodos.OperacionBinaria,
       'unaria': nodos.OperacionUnaria,
       'declaracionVariable': nodos.DeclaracionVariable,
       'referenciaVariable': nodos.ReferenciaVariable,
+      'tipoVariable': nodos.TipoVariable,
       'print': nodos.Print,
       'expresionStmt': nodos.ExpresionStmt,
       'asignacion': nodos.Asignacion,
@@ -17,9 +17,7 @@
       'for': nodos.For,
       'incremento': nodos.Incremento,
       'decremento': nodos.Decremento,
-      'cadena': nodos.Cadena,
-      'caracter': nodos.Caracter,
-      'booleano': nodos.Booleano
+      'primitivo': nodos.Primitivo
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -33,9 +31,9 @@ programa = _ dcl:Declaracion* _ { return dcl }
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
 
-VarDcl = tipo:TipoDato _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('declaracionVariable', { tipo, id, exp }) }
-
-TipoDato = "int" / "float" / "string" / "bool" / "var" / "char"
+VarDcl = tipo:TipoDato _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
+        / "var" _ id:Identificador _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
+TipoDato = "int" / "float" / "string" / "boolean" / "char"
 
 Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
@@ -114,29 +112,18 @@ Multiplicacion = izq:Unaria expansion:(
     )
 }
 
-Unaria = "-" _ num:Numero { return crearNodo('unaria', { op: '-', exp: num }) }
+Unaria = "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
           / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
-          / Booleano
-          / Cadena
-          / Caracter
+          / Primitivos
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
-          / Numero
 
-Booleano = "true" { return crearNodo('booleano', { valor: true }) }
-          / "false" { return crearNodo('booleano', { valor: false }) }
-
-Cadena = "\"" chars:[^"]* "\"" {
-  return crearNodo('cadena', { valor: chars.join("") });
-}
-
-Caracter = "'" char:[^'] "'" {
-  return crearNodo('caracter', { valor: char });
-}
-
-Numero = [0-9]+( "." [0-9]+ )? { return crearNodo('numero', { valor: parseFloat(text(), 10) })}
-  / "(" _ exp:Expresion _ ")" { return crearNodo('agrupacion', { exp }) }
-  / id:Identificador { return crearNodo('referenciaVariable', { id }) }
+Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
+    / bool:("true"/"false") { return bool == "true" ? crearNodo('primitivo', { valor: true, tipo: 'boolean' }) : crearNodo('primitivo', { valor: false, tipo: 'boolean' }) }
+    / "'" char:[^'] "'" { return crearNodo('primitivo', { valor: char, tipo: 'char' }) }
+    / "\"" chars:([^"]*) "\"" { return crearNodo('primitivo', { valor: chars.join(""), tipo: 'string' }) }
+    / "(" exp:Expresion ")" { return crearNodo('agrupacion', { exp })}
+    / id: Identificador { return crearNodo('referenciaVariable', { id }) }
 
 _ = (Comentario / [ \t\n\r])*
 
