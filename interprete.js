@@ -224,49 +224,70 @@ export class InterpreterVisitor extends BaseVisitor{
     }
 
     /**
-     * @type {BaseVisitor['visitTipoVariable']}
-     */
-    visitTipoVariable(node) {
-        var tipoVar = node.tipo;
-        const nombreVar = node.id;
-        
-        if(node.exp){
-            const valor = node.exp.accept(this);
+ * @type {BaseVisitor['visitTipoVariable']}
+ */
+visitTipoVariable(node) {
+    var tipoVar = node.tipo;
+    const nombreVar = node.id;
+    
+    if (node.exp) {
+        const valor = node.exp.accept(this);
 
-            if (tipoVar === "int") {
-                if (tipoVar !== valor.tipo) {
-                    throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                }
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
-            } else if (tipoVar === "float") {
-                if (tipoVar !== valor.tipo && valor.tipo !== "int") {
-                    throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                }
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
-            } else if (tipoVar === "string") {
-                if (tipoVar !== valor.tipo) {
-                    throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                }
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
-            } else if (tipoVar === "boolean") {
-                if (tipoVar !== valor.tipo) {
-                    throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                }
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
-            } else if (tipoVar === "char") {
-                if (tipoVar !== valor.tipo) {
-                    throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                }
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
-            } else {
-                throw new Error(`Tipo ${tipoVar} no es valido`);
+        if (tipoVar === "int") {
+            if (tipoVar !== valor.tipo) {
+                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            
-            return
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+        } else if (tipoVar === "float") {
+            if (tipoVar !== valor.tipo && valor.tipo !== "int") {
+                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+            }
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+        } else if (tipoVar === "string") {
+            if (tipoVar !== valor.tipo) {
+                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+            }
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+        } else if (tipoVar === "boolean") {
+            if (tipoVar !== valor.tipo) {
+                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+            }
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+        } else if (tipoVar === "char") {
+            if (tipoVar !== valor.tipo) {
+                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+            }
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+        } else {
+            throw new Error(`Tipo ${tipoVar} no es valido`);
         }
-
-        this.entornoActual.setVariable(tipoVar, nombreVar, null);
+        
+        return;
     }
+
+    // Asignar valores predeterminados en lugar de null
+    let valorPredeterminado;
+    switch (tipoVar) {
+        case "int":
+        case "float":
+            valorPredeterminado = 0; // Asigna 0 tanto para int como para float
+            break;
+        case "char":
+            valorPredeterminado = ''; // Asigna un carácter vacío para char
+            break;
+        case "string":
+            valorPredeterminado = ""; // Asigna una cadena vacía para string
+            break;
+        case "boolean":
+            valorPredeterminado = true; // Asigna true para boolean
+            break;
+        default:
+            throw new Error(`Tipo ${tipoVar} no es valido`);
+    }
+
+    this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado);
+}
+
 
     /**
     *@type {BaseVisitor['visitDeclaracionVariable']}

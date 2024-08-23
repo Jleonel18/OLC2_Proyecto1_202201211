@@ -31,7 +31,7 @@ programa = _ dcl:Declaracion* _ { return dcl }
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
 
-VarDcl = tipo:TipoDato _ id:Identificador _ "=" _ exp:Expresion _ ";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
+VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return exp})?";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
         / "var" _ id:Identificador _ ";" { return crearNodo('declaracionVariable', { id, exp }) }
 TipoDato = "int" / "float" / "string" / "boolean" / "char"
 

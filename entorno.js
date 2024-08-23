@@ -46,7 +46,6 @@ updateVariable(nombre, valor) {
     //console.log("El tipo del valor es: ", valor.tipo);
 
     if (valorAct != undefined) {
-        // Verificación específica de tipos
         if (valorAct.tipo === "string" && valor.tipo !== "string") {
             throw new Error(`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`);
         }
