@@ -60,6 +60,7 @@ export class Entorno {
     updateVariable(nombre, valor) {
         const valorAct = this.valores[nombre];
 
+
         if(valorAct != undefined) {
             this.valores[nombre].valor = valor;
             return;

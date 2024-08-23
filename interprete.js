@@ -186,7 +186,10 @@ export class InterpreterVisitor extends BaseVisitor{
      * @type {BaseVisitor['visitPrint']}
      */
     visitPrint(node) {
-        this.salida += node.exp.accept(this) + '\n';
+        const valor = node.exp.accept(this);
+        this.salida += valor+ ' ';
+        node.exps.forEach(exp => this.salida += exp.accept(this) + ' ');
+        this.salida += '\n';
     }
     
 

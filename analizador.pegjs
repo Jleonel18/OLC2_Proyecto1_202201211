@@ -37,7 +37,7 @@ VarDcl = tipo:TipoDato _ id:Identificador _ "=" _ exp:Expresion _ ";" { return c
 
 TipoDato = "int" / "float" / "string" / "bool" / "var" / "char"
 
-Stmt = "print(" _ exp:Expresion _ ")" _ ";" { return crearNodo('print', { exp }) }
+Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
     / "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 

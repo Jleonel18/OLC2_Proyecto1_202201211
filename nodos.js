@@ -311,8 +311,9 @@ export class Print extends Expresion {
     /**
     * @param {Object} options
     * @param {Expresion} options.exp Expresion a imprimir
+ * @param {Expresion[]} options.exps Expresiones a imprimir
     */
-    constructor({ exp }) {
+    constructor({ exp, exps }) {
         super();
         
         /**
@@ -320,6 +321,13 @@ export class Print extends Expresion {
          * @type {Expresion}
         */
         this.exp = exp;
+
+
+        /**
+         * Expresiones a imprimir
+         * @type {Expresion[]}
+        */
+        this.exps = exps;
 
     }
 
