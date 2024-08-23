@@ -42,8 +42,8 @@ export class Entorno {
 updateVariable(nombre, valor) {
     const valorAct = this.valores[nombre];
 
-    console.log("El tipo de la variable es: ", valorAct.tipo);
-    console.log("El tipo del valor es: ", valor.tipo);
+    //console.log("El tipo de la variable es: ", valorAct);
+    //console.log("El tipo del valor es: ", valor.tipo);
 
     if (valorAct != undefined) {
         // Verificación específica de tipos

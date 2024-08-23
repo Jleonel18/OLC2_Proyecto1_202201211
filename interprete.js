@@ -189,9 +189,21 @@ export class InterpreterVisitor extends BaseVisitor{
         const exp = node.exp.accept(this);
         switch(node.op) {
             case '-': 
-                return -exp;
+                switch(exp.tipo){
+                    case "int":
+                        return {valor: -exp.valor, tipo: exp.tipo}
+                    case "float":
+                        return {valor: -exp.valor, tipo: exp.tipo}
+                    default:
+                        throw new Error(`No es valida la operación`)
+                }
             case '!':
-                return !exp;
+                switch(exp.tipo){
+                    case "boolean":
+                        return {valor: !exp.valor, tipo: exp.tipo}
+                    default:
+                        throw new Error(`Solamente se pueden negar operadores lógicos`)
+                }
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }
@@ -284,19 +296,29 @@ export class InterpreterVisitor extends BaseVisitor{
     visitIncremento(node){
         const nombreVariable = node.id;
         const valorVariable = this.entornoActual.getVariable(nombreVariable);
-        this.entornoActual.updateVariable(nombreVariable,( parseInt(valorVariable) + 1));
-        return parseInt(valorVariable + 1);
+        //console.log("el tipo de variable es:",valorVariable.tipo)
+        if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
+            throw new Error(`No se puede incrementar una variable que no es de tipo int o float`);
+        }
+
+        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo});
+        return {valor:valorVariable.valor + 1 , tipo: valorVariable.tipo};
     }
 
     /**
      * @type {BaseVisitor['visitDecremento']}
      */
     visitDecremento(node){
-            
-            const nombreVariable = node.id;
-            const valorVariable = this.entornoActual.getVariable(nombreVariable);
-            this.entornoActual.updateVariable(nombreVariable,( parseInt(valorVariable) - 1));
-            return parseInt(valorVariable - 1);
+
+        const nombreVariable = node.id;
+        const valorVariable = this.entornoActual.getVariable(nombreVariable);
+        //console.log("el tipo de variable es:",valorVariable.tipo)
+        if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
+            throw new Error(`No se puede incrementar una variable que no es de tipo int o float`);
+        }
+
+        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo});
+        return {valor:valorVariable.valor - 1 , tipo: valorVariable.tipo};
     }
 
     /**
@@ -346,9 +368,9 @@ visitAsignacion(node) {
      */
     visitIf(node) {
         const condicion = node.cond.accept(this);
-        console.log("Condicion: ", condicion);
+        console.log("Condicion: ", condicion.valor);
         
-        if(condicion){
+        if(condicion.valor){
             node.stmtT.accept(this);
             return
         }
@@ -362,7 +384,7 @@ visitAsignacion(node) {
      * @type {BaseVisitor['visitWhile']}
      */
     visitWhile(node) {
-        while(node.cond.accept(this)) {
+        while(node.cond.accept(this).valor) {
             node.stmt.accept(this);
         }
     }
@@ -376,7 +398,8 @@ visitAsignacion(node) {
         this.entornoActual  = new Entorno(entornoAnterior);
         node.inic.accept(this);
 
-        while(node.cond.accept(this)) {
+        while(node.cond.accept(this).valor) {
+            //console.log("La condiciones:",node.cond.accept(this))
             node.stmt.accept(this);
             node.incremento.accept(this);
         }

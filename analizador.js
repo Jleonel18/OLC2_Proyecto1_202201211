@@ -1640,21 +1640,41 @@ function peg$parse(input, options) {
         s0 = peg$FAILED;
       }
       if (s0 === peg$FAILED) {
-        s0 = peg$parsePrimitivos();
+        s0 = peg$currPos;
+        s1 = peg$parseIdentificador();
+        if (s1 !== peg$FAILED) {
+          if (input.substr(peg$currPos, 2) === peg$c28) {
+            s2 = peg$c28;
+            peg$currPos += 2;
+          } else {
+            s2 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$e32); }
+          }
+          if (s2 !== peg$FAILED) {
+            peg$savedPos = s0;
+            s0 = peg$f27(s1);
+          } else {
+            peg$currPos = s0;
+            s0 = peg$FAILED;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$FAILED;
+        }
         if (s0 === peg$FAILED) {
           s0 = peg$currPos;
           s1 = peg$parseIdentificador();
           if (s1 !== peg$FAILED) {
-            if (input.substr(peg$currPos, 2) === peg$c28) {
-              s2 = peg$c28;
+            if (input.substr(peg$currPos, 2) === peg$c29) {
+              s2 = peg$c29;
               peg$currPos += 2;
             } else {
               s2 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$e32); }
+              if (peg$silentFails === 0) { peg$fail(peg$e33); }
             }
             if (s2 !== peg$FAILED) {
               peg$savedPos = s0;
-              s0 = peg$f27(s1);
+              s0 = peg$f28(s1);
             } else {
               peg$currPos = s0;
               s0 = peg$FAILED;
@@ -1664,27 +1684,7 @@ function peg$parse(input, options) {
             s0 = peg$FAILED;
           }
           if (s0 === peg$FAILED) {
-            s0 = peg$currPos;
-            s1 = peg$parseIdentificador();
-            if (s1 !== peg$FAILED) {
-              if (input.substr(peg$currPos, 2) === peg$c29) {
-                s2 = peg$c29;
-                peg$currPos += 2;
-              } else {
-                s2 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$e33); }
-              }
-              if (s2 !== peg$FAILED) {
-                peg$savedPos = s0;
-                s0 = peg$f28(s1);
-              } else {
-                peg$currPos = s0;
-                s0 = peg$FAILED;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$FAILED;
-            }
+            s0 = peg$parsePrimitivos();
           }
         }
       }

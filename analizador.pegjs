@@ -114,9 +114,9 @@ Multiplicacion = izq:Unaria expansion:(
 
 Unaria = "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
           / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
-          / Primitivos
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
+          / Primitivos
 
 Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
     / bool:("true"/"false") { return bool == "true" ? crearNodo('primitivo', { valor: true, tipo: 'boolean' }) : crearNodo('primitivo', { valor: false, tipo: 'boolean' }) }
