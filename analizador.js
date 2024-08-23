@@ -280,7 +280,7 @@ function peg$parse(input, options) {
   var peg$f2 = function(stmt) { return stmt };
   var peg$f3 = function(tipo, id, exp) {return exp};
   var peg$f4 = function(tipo, id, exp) { return crearNodo('tipoVariable', { tipo, id, exp }) };
-  var peg$f5 = function(id) { return crearNodo('declaracionVariable', { id, exp }) };
+  var peg$f5 = function(id, exp) { return crearNodo('declaracionVariable', { id, exp }) };
   var peg$f6 = function(exp, exps) {return exps};
   var peg$f7 = function(exp, exps) { return crearNodo('print', { exp, exps }) };
   var peg$f8 = function(exp) { return crearNodo('expresionStmt', { exp }) };
@@ -634,16 +634,35 @@ function peg$parse(input, options) {
         s3 = peg$parseIdentificador();
         if (s3 !== peg$FAILED) {
           s4 = peg$parse_();
-          if (input.charCodeAt(peg$currPos) === 59) {
-            s5 = peg$c1;
+          if (input.charCodeAt(peg$currPos) === 61) {
+            s5 = peg$c0;
             peg$currPos++;
           } else {
             s5 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$e1); }
+            if (peg$silentFails === 0) { peg$fail(peg$e0); }
           }
           if (s5 !== peg$FAILED) {
-            peg$savedPos = s0;
-            s0 = peg$f5(s3);
+            s6 = peg$parse_();
+            s7 = peg$parseAsignacion();
+            if (s7 !== peg$FAILED) {
+              if (input.charCodeAt(peg$currPos) === 59) {
+                s8 = peg$c1;
+                peg$currPos++;
+              } else {
+                s8 = peg$FAILED;
+                if (peg$silentFails === 0) { peg$fail(peg$e1); }
+              }
+              if (s8 !== peg$FAILED) {
+                peg$savedPos = s0;
+                s0 = peg$f5(s3, s7);
+              } else {
+                peg$currPos = s0;
+                s0 = peg$FAILED;
+              }
+            } else {
+              peg$currPos = s0;
+              s0 = peg$FAILED;
+            }
           } else {
             peg$currPos = s0;
             s0 = peg$FAILED;

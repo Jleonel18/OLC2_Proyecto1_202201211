@@ -289,15 +289,24 @@ visitTipoVariable(node) {
 }
 
 
-    /**
-    *@type {BaseVisitor['visitDeclaracionVariable']}
-    */
-    visitDeclaracionVariable(node) {
-        var nombreVariable = node.id;
-        var valorVariable = node.exp.accept(this);
+/**
+ * @type {BaseVisitor['visitDeclaracionVariable']}
+ */
+visitDeclaracionVariable(node) {
+    const nombreVariable = node.id;
     
-        this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor);
+    // Verificar si hay una expresión asignada
+    if (!node.exp) {
+        throw new Error(`Error semántico: La variable '${nombreVariable}' debe ser inicializada con un valor.`);
     }
+
+    // Evaluar la expresión para obtener el valor y el tipo
+    const valorVariable = node.exp.accept(this);
+    
+    // Asignar la variable con el tipo y valor deducidos
+    this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor);
+}
+
     
     /**
      * @type {BaseVisitor['visitReferenciaVariable']}
