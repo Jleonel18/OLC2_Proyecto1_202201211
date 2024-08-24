@@ -231,6 +231,22 @@ export class InterpreterVisitor extends BaseVisitor{
                 return {valor:exp.tipo ,tipo:'string'};
             case 'toString':
                 return {valor:exp.valor.toString(),tipo:'string'};
+            case 'toUpperCase':
+
+                if(exp.tipo != "string"){
+                    throw new Error(`No se puede convertir a mayúsculas un valor que no es de tipo string`);
+                }
+
+                return {valor:exp.valor.toUpperCase(),tipo:'string'};
+                
+            case 'toLowerCase':
+
+                if(exp.tipo != "string"){
+                    throw new Error(`No se puede convertir a minúsculas un valor que no es de tipo string`);
+                }
+
+                return {valor:exp.valor.toLowerCase(),tipo:'string'};
+
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }

@@ -115,6 +115,8 @@ Multiplicacion = izq:Unaria expansion:(
 }
 
 Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toString', exp }) }
+          / "toUpperCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toUpperCase', exp }) }
+          / "toLowerCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toLowerCase', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
           / "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
           / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
