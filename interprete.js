@@ -178,6 +178,28 @@ export class InterpreterVisitor extends BaseVisitor{
                     default:
                         throw new Error('No es valida esa operacion');
                 }
+            case '+=':
+                switch (`${izq.tipo}-${der.tipo}`) {
+                    case "int-int":
+                        return { valor: izq.valor + der.valor, tipo: "int" };
+                    case "float-int":
+                    case "float-float":
+                        return { valor: izq.valor + der.valor, tipo: "float" };
+                    case "string-string":
+                        return { valor: izq.valor + der.valor, tipo: "string" };
+                    default:
+                        throw new Error('No es valida esa operacion');
+                }
+            case '-=':
+                switch (`${izq.tipo}-${der.tipo}`) {
+                    case "int-int":
+                        return { valor: izq.valor - der.valor, tipo: "int" };
+                    case "float-int":
+                    case "float-float":
+                        return { valor: izq.valor - der.valor, tipo: "float" };
+                    default:
+                        throw new Error('No es valida esa operacion');
+                }
             default: throw new Error(`Operador desconocido: ${node.operador}`);
         }
     }
@@ -265,7 +287,6 @@ visitTipoVariable(node) {
         return;
     }
 
-    // Asignar valores predeterminados en lugar de null
     let valorPredeterminado;
     switch (tipoVar) {
         case "int":
