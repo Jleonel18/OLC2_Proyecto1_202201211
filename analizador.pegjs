@@ -114,9 +114,10 @@ Multiplicacion = izq:Unaria expansion:(
     )
 }
 
-Unaria = "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
-          / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
+Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toString', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
+          / "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
+          / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
           / Primitivos

@@ -229,6 +229,8 @@ export class InterpreterVisitor extends BaseVisitor{
             case 'typeof':
                 //console.log("el tipo es:",exp.tipo)
                 return {valor:exp.tipo ,tipo:'string'};
+            case 'toString':
+                return {valor:exp.valor.toString(),tipo:'string'};
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }
@@ -339,7 +341,7 @@ visitDeclaracionVariable(node) {
         const nombreVariable = node.id
         const valorVariable = this.entornoActual.getVariable(nombreVariable)
 
-        console.log("el valor de la variable es: ", valorVariable);
+        //console.log("el valor de la variable es: ", valorVariable);
         
         return {valor: valorVariable.valor, tipo: valorVariable.tipo};
     }
