@@ -19,6 +19,9 @@
  * @typedef {import('./nodos').DeclaracionVariable} DeclaracionVariable
 
 
+ * @typedef {import('./nodos').Ternario} Ternario
+
+
  * @typedef {import('./nodos').TipoVariable} TipoVariable
 
 
@@ -112,6 +115,15 @@ export class BaseVisitor {
      */
     visitDeclaracionVariable(node) {
         throw new Error('Metodo visitDeclaracionVariable no implementado');
+    }
+    
+
+    /**
+     * @param {Ternario} node
+     * @returns {any}
+     */
+    visitTernario(node) {
+        throw new Error('Metodo visitTernario no implementado');
     }
     
 

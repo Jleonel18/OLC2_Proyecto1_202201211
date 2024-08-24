@@ -282,6 +282,24 @@ export class InterpreterVisitor extends BaseVisitor{
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }
     }
+
+    /**
+     * @type {BaseVisitor['visitTernario']}
+     */
+    visitTernario(node) {
+        const condicion = node.condi.accept(this);
+
+        if(condicion.tipo != "boolean"){
+            throw new Error(`La condición del operador ternario debe ser de tipo boolean`);
+        }
+
+        if(condicion.valor){
+            return node.exp1.accept(this);
+        }else{
+            return node.exp2.accept(this);
+        }
+
+    }
     
     /**
     *@type {BaseVisitor['visitAgrupacion']}

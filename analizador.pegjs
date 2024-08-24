@@ -17,7 +17,8 @@
       'for': nodos.For,
       'incremento': nodos.Incremento,
       'decremento': nodos.Decremento,
-      'primitivo': nodos.Primitivo
+      'primitivo': nodos.Primitivo,
+      'ternario': nodos.Ternario
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -49,10 +50,13 @@ Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
 Expresion = Asignacion
 
-Asignacion = id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
+Asignacion =  Ternario
+            / id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
             / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
             / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
             / Logico
+
+Ternario = condi:Logico _ "?" _ exp1:Logico _ ":" _ exp2:Logico { return crearNodo('ternario', { condi, exp1, exp2 }) }
 
 Logico = izq:Igualacion expansion:(
           _ op:("&&" / "||") _ der:Igualacion { return { tipo: op, der } }
