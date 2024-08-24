@@ -238,7 +238,7 @@ export class InterpreterVisitor extends BaseVisitor{
                 }
 
                 return {valor:exp.valor.toUpperCase(),tipo:'string'};
-                
+
             case 'toLowerCase':
 
                 if(exp.tipo != "string"){
@@ -246,6 +246,37 @@ export class InterpreterVisitor extends BaseVisitor{
                 }
 
                 return {valor:exp.valor.toLowerCase(),tipo:'string'};
+            
+            case 'parseInt':
+                // Verificar si exp.tipo es "string"
+                if (exp.tipo === "string") {
+                    // Intentar convertir el string a float primero
+                    const num = parseFloat(exp.valor);
+            
+                    // Verificar si el valor convertido es un número y no tiene letras
+                    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(exp.valor)) {
+                        // Convertir a int redondeando hacia abajo
+                        return { valor: Math.floor(num), tipo: 'int' };
+                    }
+                }
+            
+                // Si no se puede convertir
+                throw new Error("No se puede convertir a int");
+                
+            case 'parseFloat':
+                // Verificar si el tipo es "string"
+                if (exp.tipo === "string") {
+                    // Intentar convertir el string a float
+                    const num = parseFloat(exp.valor);
+                
+                    // Verificar si el valor convertido es un número y el string original es un número válido
+                    if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(exp.valor)) {
+                        return { valor: num, tipo: 'float' };
+                    }
+                }
+                
+                // Si no se puede convertir
+                throw new Error("No se puede convertir a float");
 
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
