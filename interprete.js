@@ -226,6 +226,9 @@ export class InterpreterVisitor extends BaseVisitor{
                     default:
                         throw new Error(`Solamente se pueden negar operadores lógicos`)
                 }
+            case 'typeof':
+                //console.log("el tipo es:",exp.tipo)
+                return {valor:exp.tipo ,tipo:'string'};
             default: 
                 throw new Error(`Operador desconocido: ${node.operador}`);
         }
