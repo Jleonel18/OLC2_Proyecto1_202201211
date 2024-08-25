@@ -528,5 +528,29 @@ visitAsignacion(node) {
         this.entornoActual = entornoAnterior;
     }
 
+    /**
+     * @type {BaseVisitor['visitSwitch']}
+     */
+    visitSwitch(node) {
+        const condicion = node.exp.accept(this);
+        let bandera = false;
+
+        node.cases.forEach(caso => {
+            const entornoAnterior = this.entornoActual;
+            this.entornoActual = new Entorno(entornoAnterior);
+            if(condicion.valor == caso.exp.accept(this).valor || bandera){
+                bandera = true;
+                caso.stmt.forEach(stmt => {stmt.accept(this)});
+            }
+
+            this.entornoActual = entornoAnterior;
+
+        });
+
+        if(node.defa){
+            node.defa.forEach(sentencia => sentencia.accept(this));
+        }
+    }
+
 }
 

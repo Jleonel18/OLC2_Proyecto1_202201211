@@ -560,6 +560,47 @@ export class For extends Expresion {
     }
 }
     
+export class Switch extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.exp Expresion a evaluar
+ * @param {Expresion []} options.cases Casos del switch
+ * @param {Expresion[]|undefined} options.defa Caso por defecto
+    */
+    constructor({ exp, cases, defa }) {
+        super();
+        
+        /**
+         * Expresion a evaluar
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+
+        /**
+         * Casos del switch
+         * @type {Expresion []}
+        */
+        this.cases = cases;
+
+
+        /**
+         * Caso por defecto
+         * @type {Expresion[]|undefined}
+        */
+        this.defa = defa;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitSwitch(this);
+    }
+}
+    
 export class Incremento extends Expresion {
 
     /**
@@ -610,4 +651,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Incremento, Decremento }

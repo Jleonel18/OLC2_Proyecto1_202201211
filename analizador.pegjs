@@ -18,7 +18,8 @@
       'incremento': nodos.Incremento,
       'decremento': nodos.Decremento,
       'primitivo': nodos.Primitivo,
-      'ternario': nodos.Ternario
+      'ternario': nodos.Ternario,
+      'switch': nodos.Switch,
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -45,6 +46,10 @@ Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")
     )? { return crearNodo('if', { cond, stmtT, stmtElse }) }
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
     / "for" _ "(" _ inic: Declaracion _ cond: Expresion _ ";" _ incremento: Expresion _ ")" _ stmt:Stmt { return crearNodo('for', { inic, cond, incremento, stmt }) }
+    / "switch" _ "(" _ exp:Expresion _ ")" _ "{" _ cases:Cases* _ defa:Defaul? _ "}" { return crearNodo('switch', { exp, cases, defa }) }
+
+Cases = "case" _ exp:Expresion _ ":" _ stmt:Stmt*_ { return { exp, stmt } }
+Defaul = "default" _ ":" _ stmt:Stmt*_ { return stmt  }
 
 Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
