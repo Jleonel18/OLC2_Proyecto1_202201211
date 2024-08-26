@@ -20,6 +20,8 @@
       'primitivo': nodos.Primitivo,
       'ternario': nodos.Ternario,
       'switch': nodos.Switch,
+      'arreglo': nodos.Arreglo,
+      'arregloVacio': nodos.ArregloVacio
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -32,6 +34,7 @@ programa = _ dcl:Declaracion* _ { return dcl }
 
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
+            / arreglo:Arreglo _ { return arreglo }
 
 VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return exp})?";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
         / "var" _ id:Identificador _ "=" _ exp:Expresion ";" { return crearNodo('declaracionVariable', { id, exp }) }
@@ -50,6 +53,13 @@ Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")
 
 Cases = "case" _ exp:Expresion _ ":" _ stmt:Stmt*_ { return { exp, stmt } }
 Defaul = "default" _ ":" _ stmt:Stmt*_ { return stmt  }
+
+Arreglo = tipoDato: TipoDato _ "[]" _ id: Identificador _ "=" _ arregloVal:ArregloVal _ ";" { return crearNodo('arreglo', { tipoDato, id, arregloVal }) }
+                  / tipoDato:TipoDato _ "[]" _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ "[" _ dimension: Expresion _ "]" _ ";" {return crearNodo('arregloVacio', {tipoDato, id, tipo2, dimension})}
+
+ArregloVal = "{" _ listaValores:ListaValores _ "}" { return listaValores }
+
+ListaValores = _ exp: Expresion _ exps:( "," _ exps: Expresion { return exps }) * _ { return {d1:exp, d2:exps} }
 
 Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 

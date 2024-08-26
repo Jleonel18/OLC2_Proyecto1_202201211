@@ -52,6 +52,12 @@
  * @typedef {import('./nodos').Switch} Switch
 
 
+ * @typedef {import('./nodos').Arreglo} Arreglo
+
+
+ * @typedef {import('./nodos').ArregloVacio} ArregloVacio
+
+
  * @typedef {import('./nodos').Incremento} Incremento
 
 
@@ -217,6 +223,24 @@ export class BaseVisitor {
      */
     visitSwitch(node) {
         throw new Error('Metodo visitSwitch no implementado');
+    }
+    
+
+    /**
+     * @param {Arreglo} node
+     * @returns {any}
+     */
+    visitArreglo(node) {
+        throw new Error('Metodo visitArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {ArregloVacio} node
+     * @returns {any}
+     */
+    visitArregloVacio(node) {
+        throw new Error('Metodo visitArregloVacio no implementado');
     }
     
 

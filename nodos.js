@@ -601,6 +601,96 @@ export class Switch extends Expresion {
     }
 }
     
+export class Arreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {any} options.tipoDato Tipo de dato del arreglo
+ * @param {Expresion} options.id Identificador del arreglo
+ * @param {Expresion} options.arregloVal Lista de valores del arreglo
+    */
+    constructor({ tipoDato, id, arregloVal }) {
+        super();
+        
+        /**
+         * Tipo de dato del arreglo
+         * @type {any}
+        */
+        this.tipoDato = tipoDato;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Lista de valores del arreglo
+         * @type {Expresion}
+        */
+        this.arregloVal = arregloVal;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitArreglo(this);
+    }
+}
+    
+export class ArregloVacio extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {any} options.tipoDato Tipo de dato del arreglo
+ * @param {Expresion} options.id Identificador del arreglo
+ * @param {any} options.tipo2 Tipo 2 de dato del arreglo
+ * @param {Expresion} options.dimension Dimension del arreglo
+    */
+    constructor({ tipoDato, id, tipo2, dimension }) {
+        super();
+        
+        /**
+         * Tipo de dato del arreglo
+         * @type {any}
+        */
+        this.tipoDato = tipoDato;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Tipo 2 de dato del arreglo
+         * @type {any}
+        */
+        this.tipo2 = tipo2;
+
+
+        /**
+         * Dimension del arreglo
+         * @type {Expresion}
+        */
+        this.dimension = dimension;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitArregloVacio(this);
+    }
+}
+    
 export class Incremento extends Expresion {
 
     /**
@@ -651,4 +741,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Arreglo, ArregloVacio, Incremento, Decremento }

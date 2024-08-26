@@ -529,6 +529,76 @@ visitAsignacion(node) {
     }
 
     /**
+     * @type {BaseVisitor['visitArreglo']}
+     */
+    visitArreglo(node){
+        let valores = [];
+        const tipos = node.tipoDato;
+        const ident = node.id;
+        const l1 = node.arregloVal.d1
+        const l2 = node.arregloVal.d2
+
+        console.log("Los tipos de datos son:",tipos, "y",l1.tipo);
+
+        if(tipos != l1.tipo){
+            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+        }
+        valores.push(l1.valor);
+        
+        for(let i =0; i<l2.length; i++){
+            const e = l2[i];
+            if(tipos != e.tipo){
+                throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+            }
+            valores.push(e.valor);
+        }
+
+        this.entornoActual.setVariable(tipos,ident,valores);
+        return
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitArregloVacio']}
+     */
+    visitArregloVacio(node){
+        const tipo1  = node.tipoDato;
+        const ident = node.id;
+        const tipo2 = node.tipo2;
+        const dimension = node.dimension.accept(this).valor;
+        let valorALlenar;
+
+        if(tipo1 != tipo2){
+            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+        }
+
+        if(dimension < 0){
+            throw new Error(`La dimensión del arreglo no puede ser negativa`);
+        }
+
+        if(tipo1 == "int"){
+            valorALlenar = 0;
+        }else if(tipo1 == "float"){
+            valorALlenar = 0.0;
+        }else if(tipo1 == "string"){
+            valorALlenar = "";
+        }else if(tipo1 == "boolean"){
+            valorALlenar = true;
+        }else if(tipo1 == "char"){
+            valorALlenar = '';
+        }else{
+            throw new Error(`Tipo ${tipo1} no es valido`);
+        }
+
+        let valores = new Array(dimension).fill(valorALlenar);
+
+        this.entornoActual.setVariable(tipo1,ident,valores);
+
+        return;
+
+    }
+
+    /**
      * @type {BaseVisitor['visitSwitch']}
      */
     visitSwitch(node) {
