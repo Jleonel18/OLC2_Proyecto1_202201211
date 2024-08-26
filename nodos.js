@@ -691,6 +691,47 @@ export class ArregloVacio extends Expresion {
     }
 }
     
+export class CopiarArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {any} options.tipoDato Tipo de dato del arreglo
+ * @param {Expresion} options.id Identificador del arreglo
+ * @param {Expresion} options.exp Expresion a copiar
+    */
+    constructor({ tipoDato, id, exp }) {
+        super();
+        
+        /**
+         * Tipo de dato del arreglo
+         * @type {any}
+        */
+        this.tipoDato = tipoDato;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion a copiar
+         * @type {Expresion}
+        */
+        this.exp = exp;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitCopiarArreglo(this);
+    }
+}
+    
 export class Incremento extends Expresion {
 
     /**
@@ -741,4 +782,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Arreglo, ArregloVacio, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Arreglo, ArregloVacio, CopiarArreglo, Incremento, Decremento }

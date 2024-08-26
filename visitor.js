@@ -58,6 +58,9 @@
  * @typedef {import('./nodos').ArregloVacio} ArregloVacio
 
 
+ * @typedef {import('./nodos').CopiarArreglo} CopiarArreglo
+
+
  * @typedef {import('./nodos').Incremento} Incremento
 
 
@@ -241,6 +244,15 @@ export class BaseVisitor {
      */
     visitArregloVacio(node) {
         throw new Error('Metodo visitArregloVacio no implementado');
+    }
+    
+
+    /**
+     * @param {CopiarArreglo} node
+     * @returns {any}
+     */
+    visitCopiarArreglo(node) {
+        throw new Error('Metodo visitCopiarArreglo no implementado');
     }
     
 

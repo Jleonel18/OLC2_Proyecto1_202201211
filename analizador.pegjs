@@ -21,7 +21,8 @@
       'ternario': nodos.Ternario,
       'switch': nodos.Switch,
       'arreglo': nodos.Arreglo,
-      'arregloVacio': nodos.ArregloVacio
+      'arregloVacio': nodos.ArregloVacio,
+      'copiarArreglo': nodos.CopiarArreglo
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -56,6 +57,7 @@ Defaul = "default" _ ":" _ stmt:Stmt*_ { return stmt  }
 
 Arreglo = tipoDato: TipoDato _ "[]" _ id: Identificador _ "=" _ arregloVal:ArregloVal _ ";" { return crearNodo('arreglo', { tipoDato, id, arregloVal }) }
                   / tipoDato:TipoDato _ "[]" _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ "[" _ dimension: Expresion _ "]" _ ";" {return crearNodo('arregloVacio', {tipoDato, id, tipo2, dimension})}
+                  / tipoDato: TipoDato _ "[]" _ id:Identificador _ "=" _ exp: Expresion _ ";" {return crearNodo('copiarArreglo', {tipoDato, id, exp})}
 
 ArregloVal = "{" _ listaValores:ListaValores _ "}" { return listaValores }
 

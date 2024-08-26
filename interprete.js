@@ -599,6 +599,25 @@ visitAsignacion(node) {
     }
 
     /**
+     * @type {BaseVisitor['visitCopiarArreglo']}
+     */
+    visitCopiarArreglo(node){
+
+        const tipoDato = node.tipoDato;
+        const idABuscar = node.id;
+        const arregloCopiado = node.exp.accept(this);
+
+        if(tipoDato != arregloCopiado.tipo){
+            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+        }
+
+        const nuevoArreglo = arregloCopiado.valor.slice();
+
+        this.entornoActual.setVariable(tipoDato,idABuscar,nuevoArreglo);
+        
+    }
+
+    /**
      * @type {BaseVisitor['visitSwitch']}
      */
     visitSwitch(node) {
