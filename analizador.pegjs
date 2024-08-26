@@ -22,7 +22,10 @@
       'switch': nodos.Switch,
       'arreglo': nodos.Arreglo,
       'arregloVacio': nodos.ArregloVacio,
-      'copiarArreglo': nodos.CopiarArreglo
+      'copiarArreglo': nodos.CopiarArreglo,
+      'break': nodos.Break,
+      'continue': nodos.Continue,
+      'return': nodos.Return
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -42,15 +45,24 @@ VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return e
 TipoDato = "int" / "float" / "string" / "boolean" / "char"
 
 Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
-    / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
     / "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
     stmtElse:( 
       _ "else" _ stmtElse:Stmt { return stmtElse }
     )? { return crearNodo('if', { cond, stmtT, stmtElse }) }
     / "while" _ "(" _ cond:Expresion _ ")" _ stmt:Stmt { return crearNodo('while', { cond, stmt }) }
-    / "for" _ "(" _ inic: Declaracion _ cond: Expresion _ ";" _ incremento: Expresion _ ")" _ stmt:Stmt { return crearNodo('for', { inic, cond, incremento, stmt }) }
+    / "for" _ "(" _ inic: ForInic _ cond: Expresion _ ";" _ incremento: Expresion _ ")" _ stmt:Stmt {
+      return crearNodo('for', { inic, cond, incremento, stmt })
+    }
     / "switch" _ "(" _ exp:Expresion _ ")" _ "{" _ cases:Cases* _ defa:Defaul? _ "}" { return crearNodo('switch', { exp, cases, defa }) }
+    / "break" _ ";" { return crearNodo('break') }
+    / "continue" _ ";" { return crearNodo('continue') }
+    / "return" _ exp:Expresion? _ ";" { return crearNodo('return', { exp }) }
+    / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
+
+ForInic = dc:VarDcl { return dc }
+        / exp:Expresion _ ";" { return exp }
+        / ";" { return null }
 
 Cases = "case" _ exp:Expresion _ ":" _ stmt:Stmt*_ { return { exp, stmt } }
 Defaul = "default" _ ":" _ stmt:Stmt*_ { return stmt  }

@@ -61,6 +61,15 @@
  * @typedef {import('./nodos').CopiarArreglo} CopiarArreglo
 
 
+ * @typedef {import('./nodos').Break} Break
+
+
+ * @typedef {import('./nodos').Continue} Continue
+
+
+ * @typedef {import('./nodos').Return} Return
+
+
  * @typedef {import('./nodos').Incremento} Incremento
 
 
@@ -253,6 +262,33 @@ export class BaseVisitor {
      */
     visitCopiarArreglo(node) {
         throw new Error('Metodo visitCopiarArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {Break} node
+     * @returns {any}
+     */
+    visitBreak(node) {
+        throw new Error('Metodo visitBreak no implementado');
+    }
+    
+
+    /**
+     * @param {Continue} node
+     * @returns {any}
+     */
+    visitContinue(node) {
+        throw new Error('Metodo visitContinue no implementado');
+    }
+    
+
+    /**
+     * @param {Return} node
+     * @returns {any}
+     */
+    visitReturn(node) {
+        throw new Error('Metodo visitReturn no implementado');
     }
     
 

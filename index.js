@@ -23,13 +23,22 @@ openFileInput.addEventListener('change', (event) => {
 
 btn.addEventListener('click', () => {
     const codigoFuente = editor.value;
-    const sentencias = parse(codigoFuente);
+    try{
+        
+    
+        const sentencias = parse(codigoFuente);
 
-    const interprete = new InterpreterVisitor();
+        const interprete = new InterpreterVisitor();
 
-    console.log({ sentencias });
-    sentencias.forEach(sentencia => sentencia.accept(interprete));
+        console.log({ sentencias });
+        sentencias.forEach(sentencia => sentencia.accept(interprete));
 
-    console.log("Salida:", interprete.salida);
-    salida.textContent = interprete.salida;
+        console.log("Salida:", interprete.salida);
+        salida.textContent = interprete.salida;
+    }catch(e){
+        console.log(JSON.stringify(e,null,2));
+        console.log(e.message);
+        salida.textContent ='Error: '+ e.message+ ' en linea: '+e.location.start.line+' columna: '+e.location.start.column;
+    }
+    
 });

@@ -1,5 +1,7 @@
 import { Entorno } from "./entorno.js";
 import { BaseVisitor } from "./visitor.js";
+import nodos,{ Expresion } from "./nodos.js";
+import { BreakException, ContinueException } from "./transfer.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
@@ -12,6 +14,12 @@ export class InterpreterVisitor extends BaseVisitor{
         super();
         this.entornoActual = new Entorno();
         this.salida = "";
+
+        /**
+         * @type {Expresion|null}
+         */
+        this.expPrevia = null;
+
     }
 
     /**
@@ -489,7 +497,7 @@ visitAsignacion(node) {
      */
     visitIf(node) {
         const condicion = node.cond.accept(this);
-        console.log("Condicion: ", condicion.valor);
+        //console.log("Condicion: ", condicion.valor);
         
         if(condicion.valor){
             node.stmtT.accept(this);
@@ -505,9 +513,30 @@ visitAsignacion(node) {
      * @type {BaseVisitor['visitWhile']}
      */
     visitWhile(node) {
-        while(node.cond.accept(this).valor) {
-            node.stmt.accept(this);
+
+        const entornoAnterior = this.entornoActual;
+
+        try{
+
+            while(node.cond.accept(this).valor) {
+                node.stmt.accept(this);
+            }
+
+        }catch(e){
+
+            this.entornoActual = entornoAnterior;
+
+            if(e instanceof BreakException){
+                return;
+            }
+
+            if(e instanceof ContinueException){
+                return this.visitWhile(node);
+            }
+
+            throw e;
         }
+        
     }
 
     /**
@@ -515,17 +544,65 @@ visitAsignacion(node) {
      */
     visitFor(node) {
 
-        const entornoAnterior = this.entornoActual;
-        this.entornoActual  = new Entorno(entornoAnterior);
-        node.inic.accept(this);
+        //this.expPrevia = node.inic;
 
-        while(node.cond.accept(this).valor) {
-            //console.log("La condiciones:",node.cond.accept(this))
-            node.stmt.accept(this);
-            node.incremento.accept(this);
+        const incAnt = this.expPrevia;
+        this.expPrevia = node.incremento;
+
+        const forT = new nodos.Bloque({
+            decl: [
+                node.inic,
+                new nodos.While({
+                    cond: node.cond,
+                    stmt: new nodos.Bloque({
+                        decl: [
+                            node.stmt,
+                            node.incremento
+                        ]
+                    })
+                })
+            ]
+        })
+
+        forT.accept(this);
+
+        this.expPrevia = incAnt;
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitBreak']}
+     */
+    visitBreak(node) {
+
+        throw new BreakException();
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitContinue']}
+     */
+    visitContinue(node) {
+
+        if(this.expPrevia){
+            this.expPrevia.accept(this);
         }
 
-        this.entornoActual = entornoAnterior;
+        throw new ContinueException();
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitReturn']}
+     */
+    visitReturn(node) {
+        let v = null;
+        if(node.accept(this)){
+            v = node.exp.accept(this);
+        }
+
+        throw new ReturnException(v);
+
     }
 
     /**
