@@ -153,8 +153,8 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
           / "parseInt(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseInt', exp }) }
           / "parseFloat(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseFloat', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
-          / "-" _ num:Primitivos { return crearNodo('unaria', { op: '-', exp: num }) }
-          / "!" _ exp:Expresion { return crearNodo('unaria', { op: '!', exp }) }
+          / "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
+          / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
           / Primitivos
