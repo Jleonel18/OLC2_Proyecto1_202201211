@@ -162,9 +162,18 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
 Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
     / bool:("true"/"false") { return bool == "true" ? crearNodo('primitivo', { valor: true, tipo: 'boolean' }) : crearNodo('primitivo', { valor: false, tipo: 'boolean' }) }
     / "'" char:[^'] "'" { return crearNodo('primitivo', { valor: char, tipo: 'char' }) }
-    / "\"" chars:([^"]*) "\"" { return crearNodo('primitivo', { valor: chars.join(""), tipo: 'string' }) }
+    / Cadena
     / "(" exp:Expresion ")" { return crearNodo('agrupacion', { exp })}
     / id: Identificador { return crearNodo('referenciaVariable', { id }) }
+
+Cadena = "\"" contenido:[^"]* "\""{ var text = contenido.join(""); 
+            text = text.replace(/\\n/g, "\n");
+            text = text.replace(/\\\\/g, "\\");
+            text = text.replace(/\\\"/g,"\"");
+            text = text.replace(/\\r/g, "\r");
+            text = text.replace(/\\t/g, "\t");
+            text = text.replace(/\\\'/g, "'");
+            return crearNodo('primitivo', {valor: text, tipo:'string'});}
 
 _ = (Comentario / [ \t\n\r])*
 
