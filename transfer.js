@@ -16,3 +16,12 @@ export class ReturnException extends Error {
         this.value = value;
     }
 }
+
+export class SemanticError extends Error {
+    constructor(linea,columna, message) {
+        super(message);
+        this.tipo = "Semantico";
+        this.linea = linea;
+        this.columna = columna;
+    }
+}

@@ -1,3 +1,4 @@
+import { SemanticError } from "./transfer.js";
 
 export class Entorno {
     constructor(padre = undefined) {
@@ -12,7 +13,7 @@ export class Entorno {
     setVariable(tipo, nombre, valor) {
 
         if(this.valores[nombre] != undefined) {
-            throw new Error(`Variable ${nombre} ya definida`)
+            throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} ya definida`)
         }
 
         this.valores[nombre] = {valor,tipo}
@@ -32,7 +33,7 @@ export class Entorno {
             return this.padre.getVariable(nombre);
         }
 
-        throw new Error(`Variable ${nombre} no definida`)
+        throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`)
     }
 
 /**
@@ -47,23 +48,23 @@ updateVariable(nombre, valor) {
 
     if (valorAct != undefined) {
         if (valorAct.tipo === "string" && valor.tipo !== "string") {
-            throw new Error(`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`);
+            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "char" && valor.tipo !== "char") {
-            throw new Error(`El tipo de la variable ${nombre} es 'char' y no coincide con el tipo del valor proporcionado.`);
+            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'char' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "int" && valor.tipo !== "int") {
-            throw new Error(`El tipo de la variable ${nombre} es 'int' y solo puede aceptar valores de tipo 'int'.`);
+            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'int' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "float" && (valor.tipo !== "float" && valor.tipo !== "int")) {
-            throw new Error(`El tipo de la variable ${nombre} es 'float' y solo puede aceptar valores de tipo 'float' o 'int'.`);
+            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'float' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "boolean" && valor.tipo !== "boolean") {
-            throw new Error(`El tipo de la variable ${nombre} es 'boolean' y no coincide con el tipo del valor proporcionado.`);
+            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'boolean' y no coincide con el tipo del valor proporcionado.`)
         }
 
         // Asignar el valor si las condiciones se cumplen
@@ -78,7 +79,7 @@ updateVariable(nombre, valor) {
         return;
     }
 
-    throw new Error(`Variable ${nombre} no definida`);
+    throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`)
 }
 
 

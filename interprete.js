@@ -1,7 +1,7 @@
 import { Entorno } from "./entorno.js";
 import { BaseVisitor } from "./visitor.js";
 import nodos,{ Expresion } from "./nodos.js";
-import { BreakException, ContinueException } from "./transfer.js";
+import { BreakException, ContinueException, SemanticError } from "./transfer.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
@@ -49,7 +49,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "string-string":
                         return { valor: izq.valor + der.valor, tipo: "string" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
 
             case '-':
@@ -61,7 +61,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor - der.valor, tipo: "float" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '*': 
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -72,12 +72,12 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor * der.valor, tipo: "float" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
                 case '/':
                     // Verifica si el divisor es cero antes de realizar la división
                     if (der.valor === 0) {
-                        throw new Error('División por cero no permitida');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
                     }
                 
                     switch (`${izq.tipo}-${der.tipo}`) {
@@ -93,7 +93,7 @@ export class InterpreterVisitor extends BaseVisitor{
                             return { valor: izq.valor / der.valor, tipo: "float" };
                         
                         default:
-                            throw new Error('No es valida esa operacion');
+                            throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                     }
             case '<':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -104,7 +104,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor < der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '>':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -115,7 +115,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor > der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '<=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -126,7 +126,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor <= der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '>=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -137,14 +137,14 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor >= der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '%': 
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
                         return { valor: izq.valor % der.valor, tipo: "int" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '==':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -157,7 +157,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor == der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '!=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -170,21 +170,21 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor != der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '&&':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
                         return { valor: izq.valor && der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '||':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
                         return { valor: izq.valor || der.valor, tipo: "boolean" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '+=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -196,7 +196,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "string-string":
                         return { valor: izq.valor + der.valor, tipo: "string" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '-=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -206,9 +206,9 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor - der.valor, tipo: "float" };
                     default:
-                        throw new Error('No es valida esa operacion');
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
-            default: throw new Error(`Operador desconocido: ${node.operador}`);
+            default: throw new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
         }
     }
     
@@ -225,14 +225,14 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float":
                         return {valor: -exp.valor, tipo: exp.tipo}
                     default:
-                        throw new Error(`No es valida la operación`)
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case '!':
                 switch(exp.tipo){
                     case "boolean":
                         return {valor: !exp.valor, tipo: exp.tipo}
                     default:
-                        throw new Error(`Solamente se pueden negar operadores lógicos`)
+                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                 }
             case 'typeof':
                 //console.log("el tipo es:",exp.tipo)
@@ -242,7 +242,7 @@ export class InterpreterVisitor extends BaseVisitor{
             case 'toUpperCase':
 
                 if(exp.tipo != "string"){
-                    throw new Error(`No se puede convertir a mayúsculas un valor que no es de tipo string`);
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a mayúsculas un valor que no es de tipo string`);
                 }
 
                 return {valor:exp.valor.toUpperCase(),tipo:'string'};
@@ -250,7 +250,7 @@ export class InterpreterVisitor extends BaseVisitor{
             case 'toLowerCase':
 
                 if(exp.tipo != "string"){
-                    throw new Error(`No se puede convertir a minúsculas un valor que no es de tipo string`);
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a minúsculas un valor que no es de tipo string`);
                 }
 
                 return {valor:exp.valor.toLowerCase(),tipo:'string'};
@@ -269,7 +269,7 @@ export class InterpreterVisitor extends BaseVisitor{
                 }
             
                 // Si no se puede convertir
-                throw new Error("No se puede convertir a int");
+                throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a int`);
                 
             case 'parseFloat':
                 // Verificar si el tipo es "string"
@@ -284,10 +284,10 @@ export class InterpreterVisitor extends BaseVisitor{
                 }
                 
                 // Si no se puede convertir
-                throw new Error("No se puede convertir a float");
+                throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a float`);
 
             default: 
-                throw new Error(`Operador desconocido: ${node.operador}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
         }
     }
 
@@ -298,7 +298,7 @@ export class InterpreterVisitor extends BaseVisitor{
         const condicion = node.condi.accept(this);
 
         if(condicion.tipo != "boolean"){
-            throw new Error(`La condición del operador ternario debe ser de tipo boolean`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`La condición del operador ternario debe ser de tipo boolean`);
         }
 
         if(condicion.valor){
@@ -335,31 +335,31 @@ visitTipoVariable(node) {
 
         if (tipoVar === "int") {
             if (tipoVar !== valor.tipo) {
-                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
             this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
         } else if (tipoVar === "float") {
             if (tipoVar !== valor.tipo && valor.tipo !== "int") {
-                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
             this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
         } else if (tipoVar === "string") {
             if (tipoVar !== valor.tipo) {
-                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
             this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
         } else if (tipoVar === "boolean") {
             if (tipoVar !== valor.tipo) {
-                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
             this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
         } else if (tipoVar === "char") {
             if (tipoVar !== valor.tipo) {
-                throw new Error(`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
             this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
         } else {
-            throw new Error(`Tipo ${tipoVar} no es valido`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
         }
         
         return;
@@ -381,7 +381,7 @@ visitTipoVariable(node) {
             valorPredeterminado = true; // Asigna true para boolean
             break;
         default:
-            throw new Error(`Tipo ${tipoVar} no es valido`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
     }
 
     this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado);
@@ -396,7 +396,7 @@ visitDeclaracionVariable(node) {
     
     // Verificar si hay una expresión asignada
     if (!node.exp) {
-        throw new Error(`Error semántico: La variable '${nombreVariable}' debe ser inicializada con un valor.`);
+        throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no tiene una expresión asignada`);
     }
 
     // Evaluar la expresión para obtener el valor y el tipo
@@ -427,7 +427,7 @@ visitDeclaracionVariable(node) {
         const valorVariable = this.entornoActual.getVariable(nombreVariable);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            throw new Error(`No se puede incrementar una variable que no es de tipo int o float`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
         }
 
         this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo});
@@ -443,7 +443,7 @@ visitDeclaracionVariable(node) {
         const valorVariable = this.entornoActual.getVariable(nombreVariable);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            throw new Error(`No se puede incrementar una variable que no es de tipo int o float`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
         }
 
         this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo});
@@ -618,14 +618,14 @@ visitAsignacion(node) {
         console.log("Los tipos de datos son:",tipos, "y",l1.tipo);
 
         if(tipos != l1.tipo){
-            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
         }
         valores.push(l1.valor);
         
         for(let i =0; i<l2.length; i++){
             const e = l2[i];
             if(tipos != e.tipo){
-                throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
             }
             valores.push(e.valor);
         }
@@ -646,11 +646,11 @@ visitAsignacion(node) {
         let valorALlenar;
 
         if(tipo1 != tipo2){
-            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
         }
 
         if(dimension < 0){
-            throw new Error(`La dimensión del arreglo no puede ser negativa`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`La dimensión del arreglo no puede ser negativa`);
         }
 
         if(tipo1 == "int"){
@@ -664,7 +664,7 @@ visitAsignacion(node) {
         }else if(tipo1 == "char"){
             valorALlenar = '';
         }else{
-            throw new Error(`Tipo ${tipo1} no es valido`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipo1} no es valido`);
         }
 
         let valores = new Array(dimension).fill(valorALlenar);
@@ -685,7 +685,7 @@ visitAsignacion(node) {
         const arregloCopiado = node.exp.accept(this);
 
         if(tipoDato != arregloCopiado.tipo){
-            throw new Error(`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
         }
 
         const nuevoArreglo = arregloCopiado.valor.slice();
