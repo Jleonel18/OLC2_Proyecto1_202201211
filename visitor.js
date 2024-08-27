@@ -37,6 +37,9 @@
  * @typedef {import('./nodos').Asignacion} Asignacion
 
 
+ * @typedef {import('./nodos').AsignacionArreglo} AsignacionArreglo
+
+
  * @typedef {import('./nodos').Bloque} Bloque
 
 
@@ -53,6 +56,9 @@
 
 
  * @typedef {import('./nodos').Arreglo} Arreglo
+
+
+ * @typedef {import('./nodos').ArregloVal} ArregloVal
 
 
  * @typedef {import('./nodos').ArregloVacio} ArregloVacio
@@ -194,6 +200,15 @@ export class BaseVisitor {
     
 
     /**
+     * @param {AsignacionArreglo} node
+     * @returns {any}
+     */
+    visitAsignacionArreglo(node) {
+        throw new Error('Metodo visitAsignacionArreglo no implementado');
+    }
+    
+
+    /**
      * @param {Bloque} node
      * @returns {any}
      */
@@ -244,6 +259,15 @@ export class BaseVisitor {
      */
     visitArreglo(node) {
         throw new Error('Metodo visitArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {ArregloVal} node
+     * @returns {any}
+     */
+    visitArregloVal(node) {
+        throw new Error('Metodo visitArregloVal no implementado');
     }
     
 

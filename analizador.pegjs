@@ -20,12 +20,14 @@
       'primitivo': nodos.Primitivo,
       'ternario': nodos.Ternario,
       'switch': nodos.Switch,
-      'arreglo': nodos.Arreglo,
-      'arregloVacio': nodos.ArregloVacio,
-      'copiarArreglo': nodos.CopiarArreglo,
       'break': nodos.Break,
       'continue': nodos.Continue,
-      'return': nodos.Return
+      'return': nodos.Return,
+      'arreglo': nodos.Arreglo,
+      'arregloVal': nodos.ArregloVal,
+      'copiarArreglo': nodos.CopiarArreglo,
+      'arrregloVacio': nodos.ArregloVacio,
+      'asignacionArreglo': nodos.AsignacionArreglo
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -67,13 +69,9 @@ ForInic = dc:VarDcl { return dc }
 Cases = "case" _ exp:Expresion _ ":" _ stmt:( _ stmt:Stmt _ {return stmt})* _ { return { exp, stmt } }
 Defaul = "default" _ ":" _ stmt:(_ stmt: Stmt _ {return stmt})*_ { return stmt  }
 
-Arreglo = tipoDato: TipoDato _ "[]" _ id: Identificador _ "=" _ arregloVal:ArregloVal _ ";" { return crearNodo('arreglo', { tipoDato, id, arregloVal }) }
-                  / tipoDato:TipoDato _ "[]" _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ "[" _ dimension: Expresion _ "]" _ ";" {return crearNodo('arregloVacio', {tipoDato, id, tipo2, dimension})}
-                  / tipoDato: TipoDato _ "[]" _ id:Identificador _ "=" _ exp: Expresion _ ";" {return crearNodo('copiarArreglo', {tipoDato, id, exp})}
-
-ArregloVal = "{" _ listaValores:ListaValores _ "}" { return listaValores }
-
-ListaValores = _ exp: Expresion _ exps:( "," _ exps: Expresion { return exps }) * _ { return {d1:exp, d2:exps} }
+Arreglo = tipo:TipoDato _ "[" _ "]" _ id:Identificador _ "=" _ id2: Identificador _ ";" {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, exp:undefined, exps:undefined})})}
+          / tipo:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ valores:Expresion _ ";" {return crearNodo('arregloVal', {tipo, id, tmn, valores})}
+          / tipo1:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ tamanos:("[" _ vl1:Expresion _ "]" _ vl2:( _ "[" _ v:Expresion _ "]" {return v})* {return [vl1, ...vl2] }) _ ";" {return crearNodo('arrregloVacio',{tipo1, tmn, id, tipo2, tamanos})}
 
 Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
@@ -83,6 +81,7 @@ Asignacion =  Ternario
             / id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
             / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
             / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
+            / id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:("[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) _ "=" _ asg:Expresion {return crearNodo('asignacionArreglo',{id, pos, asg})}
             / Logico
 
 Ternario = condi:Logico _ "?" _ exp1:Logico _ ":" _ exp2:Logico { return crearNodo('ternario', { condi, exp1, exp2 }) }
@@ -164,6 +163,7 @@ Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('pr
     / "'" char:[^'] "'" { return crearNodo('primitivo', { valor: char, tipo: 'char' }) }
     / Cadena
     / "(" exp:Expresion ")" { return crearNodo('agrupacion', { exp })}
+    / "{" _ exp1:Expresion _ vls:("," _ exp:Expresion _ {return exp})* _ "}" { return crearNodo('arreglo',{vls: [exp1, ...vls]} ) }
     / id: Identificador { return crearNodo('referenciaVariable', { id }) }
 
 Cadena = "\"" contenido:[^"]* "\""{ var text = contenido.join(""); 

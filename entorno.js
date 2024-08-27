@@ -83,5 +83,78 @@ updateVariable(nombre, valor) {
 }
 
 
+    updateVariableArreglo(nombre,valor,indice){
+        const actual = this.valores[nombre];
+
+        if(actual != undefined){
+            if('temp' in actual.valor){
+                throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} es temporal`)
+            }
+
+            if(!Array.isArray(actual.valor))  throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo`);
+            if(Array.isArray(actual.valor[indice.valor])) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo de arreglos`);
+            if(indice.valor >= actual.valor.length) throw new SemanticError('Indefinida','Indefinida',`Indice fuera de rango`);
+
+            if(valor.tipo == "int" && actual.tipo == "float"){
+                this.valores[nombre].valor[indice.valor] = valor.valor;
+            }else if(actual.tipo != valor.tipo){
+                throw new SemanticError('Indefinida','Indefinida',`Tipo de dato incorrecto para la variable ${nombre}`);
+            }
+
+            this.valores[nombre].valor[indice.valor] = valor.valor;
+            return;
+
+        }
+
+        if(!actual && this.padre){
+            this.padre.updateVariableArreglo(nombre,valor,indice);
+            return;
+        }
+
+        throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`);
+    }
+
+    updateVariableMatriz(nombre,valor,posicion){
+        const act = this.valores[nombre];
+        
+        if(act!= undefined){
+            if('temp' in act) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} es temporal`);
+        if(!Array.isArray(act.valor)) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo`);
+
+        let arregloPivote = act.valor;
+
+        for(let i=0; i<posicion.length; i++){
+
+            const expr = posicion[i];
+
+            if(!Array.isArray(arregloPivote)) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo de arreglos`);
+
+            if(expr.tipo !== "int") throw new SemanticError('Indefinida','Indefinida',`Indice de matriz no es entero`);
+
+            if(expr.valor >= arregloPivote.length) throw new SemanticError('Indefinida','Indefinida',`Indice fuera de rango`);
+
+            if(i === posicion.length -1){
+                if(valor.tipo == "int" && act.tipo == "float"){
+                    arregloPivote[expr.valor] = valor.valor;
+                    return
+                }else if(act.tipo != valor.tipo) throw new SemanticError('Indefinida','Indefinida',`Tipo de dato incorrecto para la variable ${nombre}`);
+                arregloPivote[expr.valor] = valor.valor;
+            }else{
+                arregloPivote = arregloPivote[expr.valor];
+            }
+            
+        }
+
+        return;
+        }
+
+        if(!act && this.padre){
+            this.padre.updateVariableMatriz(nombre,valor,posicion);
+            return;
+        }
+
+        
+
+    }
 
 }

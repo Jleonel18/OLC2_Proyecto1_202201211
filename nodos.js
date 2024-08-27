@@ -412,6 +412,47 @@ export class Asignacion extends Expresion {
     }
 }
     
+export class AsignacionArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador del arreglo
+ * @param {Expresion[]} options.pos Posiciones del arreglo
+ * @param {Expresion} options.asg Expresion a asignar
+    */
+    constructor({ id, pos, asg }) {
+        super();
+        
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Posiciones del arreglo
+         * @type {Expresion[]}
+        */
+        this.pos = pos;
+
+
+        /**
+         * Expresion a asignar
+         * @type {Expresion}
+        */
+        this.asg = asg;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAsignacionArreglo(this);
+    }
+}
+    
 export class Bloque extends Expresion {
 
     /**
@@ -605,32 +646,16 @@ export class Arreglo extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {any} options.tipoDato Tipo de dato del arreglo
- * @param {Expresion} options.id Identificador del arreglo
- * @param {Expresion} options.arregloVal Lista de valores del arreglo
+    * @param {Expresion[]} options.vls Expresiones del arreglo
     */
-    constructor({ tipoDato, id, arregloVal }) {
+    constructor({ vls }) {
         super();
         
         /**
-         * Tipo de dato del arreglo
-         * @type {any}
+         * Expresiones del arreglo
+         * @type {Expresion[]}
         */
-        this.tipoDato = tipoDato;
-
-
-        /**
-         * Identificador del arreglo
-         * @type {Expresion}
-        */
-        this.id = id;
-
-
-        /**
-         * Lista de valores del arreglo
-         * @type {Expresion}
-        */
-        this.arregloVal = arregloVal;
+        this.vls = vls;
 
     }
 
@@ -642,44 +667,101 @@ export class Arreglo extends Expresion {
     }
 }
     
-export class ArregloVacio extends Expresion {
+export class ArregloVal extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {any} options.tipoDato Tipo de dato del arreglo
- * @param {Expresion} options.id Identificador del arreglo
- * @param {any} options.tipo2 Tipo 2 de dato del arreglo
- * @param {Expresion} options.dimension Dimension del arreglo
+    * @param {string} options.tipo Tipo del arreglo
+ * @param {string} options.id Identificador del arreglo
+ * @param {Expresion} options.valores Valoers del arreglo
+ * @param {string[]} options.tmn undefined
     */
-    constructor({ tipoDato, id, tipo2, dimension }) {
+    constructor({ tipo, id, valores, tmn }) {
         super();
         
         /**
-         * Tipo de dato del arreglo
-         * @type {any}
+         * Tipo del arreglo
+         * @type {string}
         */
-        this.tipoDato = tipoDato;
+        this.tipo = tipo;
 
 
         /**
          * Identificador del arreglo
-         * @type {Expresion}
+         * @type {string}
         */
         this.id = id;
 
 
         /**
-         * Tipo 2 de dato del arreglo
-         * @type {any}
+         * Valoers del arreglo
+         * @type {Expresion}
+        */
+        this.valores = valores;
+
+
+        /**
+         * undefined
+         * @type {string[]}
+        */
+        this.tmn = tmn;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitArregloVal(this);
+    }
+}
+    
+export class ArregloVacio extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo1 Tipo del arreglo
+ * @param {string[]} options.tmn Dimensiones del arreglo
+ * @param {string} options.id Identificador del arreglo
+ * @param {string} options.tipo2 Tipo de los valores del arreglo
+ * @param {Expresion[]} options.tamanos Tamaño del arreglo
+    */
+    constructor({ tipo1, tmn, id, tipo2, tamanos }) {
+        super();
+        
+        /**
+         * Tipo del arreglo
+         * @type {string}
+        */
+        this.tipo1 = tipo1;
+
+
+        /**
+         * Dimensiones del arreglo
+         * @type {string[]}
+        */
+        this.tmn = tmn;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Tipo de los valores del arreglo
+         * @type {string}
         */
         this.tipo2 = tipo2;
 
 
         /**
-         * Dimension del arreglo
-         * @type {Expresion}
+         * Tamaño del arreglo
+         * @type {Expresion[]}
         */
-        this.dimension = dimension;
+        this.tamanos = tamanos;
 
     }
 
@@ -695,29 +777,29 @@ export class CopiarArreglo extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {any} options.tipoDato Tipo de dato del arreglo
- * @param {Expresion} options.id Identificador del arreglo
- * @param {Expresion} options.exp Expresion a copiar
+    * @param {string} options.tipo Tipo del arreglo
+ * @param {string} options.id Identificador del arreglo
+ * @param {Expresion} options.exp Arreglo a copiar
     */
-    constructor({ tipoDato, id, exp }) {
+    constructor({ tipo, id, exp }) {
         super();
         
         /**
-         * Tipo de dato del arreglo
-         * @type {any}
+         * Tipo del arreglo
+         * @type {string}
         */
-        this.tipoDato = tipoDato;
+        this.tipo = tipo;
 
 
         /**
          * Identificador del arreglo
-         * @type {Expresion}
+         * @type {string}
         */
         this.id = id;
 
 
         /**
-         * Expresion a copiar
+         * Arreglo a copiar
          * @type {Expresion}
         */
         this.exp = exp;
@@ -845,4 +927,4 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While, For, Switch, Arreglo, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento }

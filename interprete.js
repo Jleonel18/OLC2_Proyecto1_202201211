@@ -480,6 +480,43 @@ visitAsignacion(node) {
 }
 
     /**
+     * @type {BaseVisitor['visitAsignacionArreglo']}
+     */
+    visitAsignacionArreglo(node) {
+        const valor = node.asg.accept(this);
+        const pos = node.pos.map(p => p.accept(this));
+
+        if(pos.length ==1){
+
+            const expresion = pos[0];
+
+            if(expresion.tipo != "int" || expresion.valor <0){
+                throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+            }
+
+            this.entornoActual.updateVariableArreglo(node.id,valor,expresion);
+            return valor;
+
+        }
+
+        if(pos.length > 1){
+            pos.forEach(p => {
+                if(p.tipo != "int" || p.valor <0){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+                }
+            });
+
+            this.entornoActual.updateVariableMatriz(node.id,valor,pos);
+            return valor;
+
+        }
+
+        this.entornoActual.updateVariable(node.id,valor);
+        return valor;
+
+    }
+
+    /**
      * @type {BaseVisitor['visitBloque']}
      */
     visitBloque(node) {
@@ -608,144 +645,260 @@ visitAsignacion(node) {
     /**
      * @type {BaseVisitor['visitArreglo']}
      */
-    visitArreglo(node){
-        let valores = [];
-        const tipos = node.tipoDato;
-        const ident = node.id;
-        const l1 = node.arregloVal.d1
-        const l2 = node.arregloVal.d2
+    visitArreglo(node) {
+        const vals = node.vls.map(v => v.accept(this));
+        const tipo1 = vals[0].tipo;
+        const igualTipo = vals.every(v => v.tipo === tipo1);
 
-        console.log("Los tipos de datos son:",tipos, "y",l1.tipo);
-
-        if(tipos != l1.tipo){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+        if(!igualTipo) {
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Los elementos del arreglo no son del mismo tipo`);
         }
-        valores.push(l1.valor);
-        
-        for(let i =0; i<l2.length; i++){
-            const e = l2[i];
-            if(tipos != e.tipo){
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+
+        const arregloGuardado  = vals.map(v => v.valor);
+
+        return {tipo:tipo1, valor:arregloGuardado};
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitArregloVal']}
+     */
+    visitArregloVal(node) {
+        const tipo = node.tipo;
+        const identificador = node.id;
+        const vals = node.valores.accept(this);
+        if(node.tmn.length <= 1){
+            
+            let pivote = [];
+
+            vals.valor.forEach(v => {
+
+                if(Array.isArray(v.valor)){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un valor`);
+                }
+
+                if(tipo == "float" && vals.tipo == "int") {
+                    pivote.push(parseFloat(v));
+                }else if (tipo != vals.tipo){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                }else{
+                    pivote.push(v);
+                }
+
+            })
+
+            this.entornoActual.setVariable(tipo, identificador, pivote);
+
+        }else{
+
+            const dimens = node.tmn.length;
+            let pivote = [];
+
+            vals.valor.forEach( v=>{
+
+                if(!Array.isArray(v)){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un arreglo`);
+                }
+
+                if(tipo == "float" && vals.tipo == "int"){
+                    pivote.push(v);
+                }else if(tipo != vals.tipo) {
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                }else{
+                    pivote.push(v);
+                }
+
+            })
+
+            if(!this.comprobarDimensiones(pivote,dimens)){
+                throw new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no son correctas`);
             }
-            valores.push(e.valor);
+
+            this.entornoActual.setVariable(tipo, identificador, pivote);
+
         }
+    }
 
-        this.entornoActual.setVariable(tipos,ident,valores);
-        return
-
+    comprobarDimensiones(arreglo, numero){
+        if (numero === 0) {
+            return !Array.isArray(arreglo);
+        }
+    
+        if (!Array.isArray(arreglo)) {
+            return false;
+        }
+    
+        // Recursivamente validar cada sub-array dentro del valor del objeto
+        for (let sub of arreglo) {
+            if (!this.comprobarDimensiones(sub, numero - 1)) {
+                return false;
+            }
+        }
+    
+        // Si todos los sub-arrays son válidos, entonces el array es válido
+        return true;
     }
 
     /**
      * @type {BaseVisitor['visitArregloVacio']}
      */
-    visitArregloVacio(node){
-        const tipo1  = node.tipoDato;
-        const ident = node.id;
+    visitArregloVacio(node) {
+
+        const tipo1 = node.tipo1;
         const tipo2 = node.tipo2;
-        const dimension = node.dimension.accept(this).valor;
-        let valorALlenar;
+        const dimens = node.tmn.length;
+        const id = node.id;
+        const tamanos = node.tamanos.map(t => t.accept(this));
 
         if(tipo1 != tipo2){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de los arreglos no coincide`);
         }
 
-        if(dimension < 0){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`La dimensión del arreglo no puede ser negativa`);
+        if(dimens != tamanos.length){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
         }
 
-        if(tipo1 == "int"){
-            valorALlenar = 0;
-        }else if(tipo1 == "float"){
-            valorALlenar = 0.0;
-        }else if(tipo1 == "string"){
-            valorALlenar = "";
-        }else if(tipo1 == "boolean"){
-            valorALlenar = true;
-        }else if(tipo1 == "char"){
-            valorALlenar = '';
+        if(dimens <= 1 && tamanos.length <=1){
+
+            if(tamanos[0].tipo != "int" || tamanos[0].valor<0){
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
+            }
+
+            let valorAsignar;
+            if(tipo1 == "int"){
+                valorAsignar = 0;
+            }else if(tipo1 == "float"){
+                valorAsignar = 0.0;
+            }else if(tipo1 == "string"){
+                valorAsignar = "";
+            }else if(tipo1 == "boolean"){
+                valorAsignar = true;
+            }else if(tipo1 == "char"){
+                valorAsignar = '';
+            }
+            
+            if(tipo1 == "boolean") valorAsignar = false;
+
+            let pivote = [];
+
+            for(let i = 0; i < tamanos[0].valor; i++){
+                pivote[i] = valorAsignar;
+            }
+            this.entornoActual.setVariable(tipo1,id,pivote);
+
         }else{
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipo1} no es valido`);
+
+            tamanos.forEach(t =>{
+                if(t.tipo != "int" || t.valor <0){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
+                }
+            })
+
+            let matrizAsignar = (tamanos, i=0) =>{
+                if(i === tamanos.length){
+                    let valorAsignar;
+                    if(tipo1 == "int"){
+                        valorAsignar = 0;
+                    }else if(tipo1 == "float"){
+                        valorAsignar = 0.0;
+                    }else if(tipo1 == "string"){
+                        valorAsignar = "";
+                    }else if(tipo1 == "boolean"){
+                        valorAsignar = true;
+                    }else if(tipo1 == "char"){
+                        valorAsignar = '';
+                    }
+                    if(tipo1 == "boolean") valorAsignar = false;
+                    return valorAsignar;
+                }
+                return new Array(tamanos[i].valor).fill().map(()=>
+                    matrizAsignar(tamanos,i+1)
+                );
+            };
+
+            this.entornoActual.setVariable(tipo1,id,matrizAsignar(tamanos));
+
         }
-
-        let valores = new Array(dimension).fill(valorALlenar);
-
-        this.entornoActual.setVariable(tipo1,ident,valores);
-
-        return;
 
     }
 
     /**
      * @type {BaseVisitor['visitCopiarArreglo']}
      */
-    visitCopiarArreglo(node){
+    visitCopiarArreglo(node) {
+        const tipo = node.tipo;
+        const id = node.id;
 
-        const tipoDato = node.tipoDato;
-        const idABuscar = node.id;
-        const arregloCopiado = node.exp.accept(this);
+        const copiaArreglo = node.exp.accept(this);
 
-        if(tipoDato != arregloCopiado.tipo){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de dato del arreglo no coincide con el tipo de dato de la declaración`);
+        if(!Array.isArray(copiaArreglo.valor)){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
         }
 
-        const nuevoArreglo = arregloCopiado.valor.slice();
+        if(tipo == "float" && copiaArreglo.tipo == "int"){
+            const copiar = [...copiaArreglo.valor];
+            this.entornoActual.setVariable(tipo,id,copiar);
+        }else if(tipo != copiaArreglo.tipo){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+        }else{
+            const copiar = [...copiaArreglo.valor];
+            this.entornoActual.setVariable(tipo,id,copiar);
+        }
 
-        this.entornoActual.setVariable(tipoDato,idABuscar,nuevoArreglo);
-        
     }
 
-/**
- * @type {BaseVisitor['visitSwitch']}
- */
-visitSwitch(node) {
-    const condicion = node.exp.accept(this);
-    let bandera = false;
+    /**
+     * @type {BaseVisitor['visitSwitch']}
+     */
+    visitSwitch(node) {
+        const condicion = node.exp.accept(this);
+        let bandera = false;
 
-    try {
-        node.cases.forEach(caso => {
-            const entornoAnterior = this.entornoActual;
-            this.entornoActual = new Entorno(entornoAnterior);
+        try {
+            node.cases.forEach(caso => {
+                const entornoAnterior = this.entornoActual;
+                this.entornoActual = new Entorno(entornoAnterior);
 
-            if (condicion.valor == caso.exp.accept(this).valor || bandera) {
-                bandera = true;
+                if (condicion.valor == caso.exp.accept(this).valor || bandera) {
+                    bandera = true;
 
-                caso.stmt.forEach(stmt => {
+                    caso.stmt.forEach(stmt => {
+                        try {
+                            stmt.accept(this);
+                        } catch (e) {
+                            if (e instanceof BreakException) {
+                                throw e; // Salir del switch
+                            } else {
+                                throw e; // Propagar cualquier otra excepción
+                            }
+                        }
+                    });
+                }
+
+                this.entornoActual = entornoAnterior;
+            });
+
+            if (node.defa) {
+                if (!bandera) { // Si nunca se activó un caso, ejecutar default
+                    node.defa.forEach(sentencia => sentencia.accept(this));
+                } else { // Si se activó un caso, incluir default en el fall-through
                     try {
-                        stmt.accept(this);
+                        node.defa.forEach(sentencia => sentencia.accept(this));
                     } catch (e) {
                         if (e instanceof BreakException) {
-                            throw e; // Salir del switch
-                        } else {
-                            throw e; // Propagar cualquier otra excepción
+                            return; // Salir del switch por un break
                         }
+                        throw e; // Propagar cualquier otra excepción no manejada
                     }
-                });
-            }
-
-            this.entornoActual = entornoAnterior;
-        });
-
-        if (node.defa) {
-            if (!bandera) { // Si nunca se activó un caso, ejecutar default
-                node.defa.forEach(sentencia => sentencia.accept(this));
-            } else { // Si se activó un caso, incluir default en el fall-through
-                try {
-                    node.defa.forEach(sentencia => sentencia.accept(this));
-                } catch (e) {
-                    if (e instanceof BreakException) {
-                        return; // Salir del switch por un break
-                    }
-                    throw e; // Propagar cualquier otra excepción no manejada
                 }
             }
+        } catch (e) {
+            if (e instanceof BreakException) {
+                return; // Manejo de la salida del switch por un break
+            }
+            throw e; // Propagar cualquier otra excepción no manejada
         }
-    } catch (e) {
-        if (e instanceof BreakException) {
-            return; // Manejo de la salida del switch por un break
-        }
-        throw e; // Propagar cualquier otra excepción no manejada
     }
-}
 
 }
 
