@@ -64,8 +64,8 @@ ForInic = dc:VarDcl { return dc }
         / exp:Expresion _ ";" { return exp }
         / ";" { return null }
 
-Cases = "case" _ exp:Expresion _ ":" _ stmt:Stmt*_ { return { exp, stmt } }
-Defaul = "default" _ ":" _ stmt:Stmt*_ { return stmt  }
+Cases = "case" _ exp:Expresion _ ":" _ stmt:( _ stmt:Stmt _ {return stmt})* _ { return { exp, stmt } }
+Defaul = "default" _ ":" _ stmt:(_ stmt: Stmt _ {return stmt})*_ { return stmt  }
 
 Arreglo = tipoDato: TipoDato _ "[]" _ id: Identificador _ "=" _ arregloVal:ArregloVal _ ";" { return crearNodo('arreglo', { tipoDato, id, arregloVal }) }
                   / tipoDato:TipoDato _ "[]" _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ "[" _ dimension: Expresion _ "]" _ ";" {return crearNodo('arregloVacio', {tipoDato, id, tipo2, dimension})}

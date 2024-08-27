@@ -694,29 +694,58 @@ visitAsignacion(node) {
         
     }
 
-    /**
-     * @type {BaseVisitor['visitSwitch']}
-     */
-    visitSwitch(node) {
-        const condicion = node.exp.accept(this);
-        let bandera = false;
+/**
+ * @type {BaseVisitor['visitSwitch']}
+ */
+visitSwitch(node) {
+    const condicion = node.exp.accept(this);
+    let bandera = false;
 
+    try {
         node.cases.forEach(caso => {
             const entornoAnterior = this.entornoActual;
             this.entornoActual = new Entorno(entornoAnterior);
-            if(condicion.valor == caso.exp.accept(this).valor || bandera){
+
+            if (condicion.valor == caso.exp.accept(this).valor || bandera) {
                 bandera = true;
-                caso.stmt.forEach(stmt => {stmt.accept(this)});
+
+                caso.stmt.forEach(stmt => {
+                    try {
+                        stmt.accept(this);
+                    } catch (e) {
+                        if (e instanceof BreakException) {
+                            throw e; // Salir del switch
+                        } else {
+                            throw e; // Propagar cualquier otra excepción
+                        }
+                    }
+                });
             }
 
             this.entornoActual = entornoAnterior;
-
         });
 
-        if(node.defa){
-            node.defa.forEach(sentencia => sentencia.accept(this));
+        if (node.defa) {
+            if (!bandera) { // Si nunca se activó un caso, ejecutar default
+                node.defa.forEach(sentencia => sentencia.accept(this));
+            } else { // Si se activó un caso, incluir default en el fall-through
+                try {
+                    node.defa.forEach(sentencia => sentencia.accept(this));
+                } catch (e) {
+                    if (e instanceof BreakException) {
+                        return; // Salir del switch por un break
+                    }
+                    throw e; // Propagar cualquier otra excepción no manejada
+                }
+            }
         }
+    } catch (e) {
+        if (e instanceof BreakException) {
+            return; // Manejo de la salida del switch por un break
+        }
+        throw e; // Propagar cualquier otra excepción no manejada
     }
+}
 
 }
 
