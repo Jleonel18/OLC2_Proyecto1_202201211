@@ -2376,9 +2376,9 @@ function peg$parse(input, options) {
             s0 = peg$FAILED;
           }
           if (s0 === peg$FAILED) {
-            s0 = peg$parseLogico();
+            s0 = peg$parseTernario();
             if (s0 === peg$FAILED) {
-              s0 = peg$parseTernario();
+              s0 = peg$parseLogico();
             }
           }
         }
