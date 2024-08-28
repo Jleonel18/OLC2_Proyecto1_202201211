@@ -412,11 +412,58 @@ visitDeclaracionVariable(node) {
      */
     visitReferenciaVariable(node) {
         const nombreVariable = node.id
-        const valorVariable = this.entornoActual.getVariable(nombreVariable)
+        const pos = node.pos.map(p => p.accept(this));
 
-        //console.log("el valor de la variable es: ", valorVariable);
+        const variable = this.entornoActual.getVariable(nombreVariable);
+
+        if(pos.length == 1){
+                
+                const expresion = pos[0];
+                if(!Array.isArray(variable.valor)){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo`);
+                }
+
+                if(Array.isArray(variable.valor[expresion.valor])){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo de una dimensión`);
+                }
+
+                if(expresion.tipo != "int"){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero`);
+                }
+
+                if(expresion.valor > variable.valor.length){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo está fuera de rango`);
+                }
+
+                return {valor: variable.valor[expresion.valor], tipo: variable.tipo};
+
+        }else if(pos.length > 1){
+
+            let pivote = variable.valor;
+
+            for(let i = 0; i < pos.length; i++){
+                const expresion = pos[i];
+                if(!Array.isArray(pivote)){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo de más de una dimensión`);
+                }
+
+                if(expresion.tipo != "int"){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero`);
+                }
+
+                if(expresion.valor > pivote.length){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo está fuera de rango`);
+                }
+
+                pivote = pivote[expresion.valor];
+
+            }
+
+            return {valor: pivote, tipo: variable.tipo};
+
+        }
         
-        return {valor: valorVariable.valor, tipo: valorVariable.tipo};
+        return {valor: variable.valor, tipo: variable.tipo};
     }
 
     /**

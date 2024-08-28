@@ -301,8 +301,9 @@ export class ReferenciaVariable extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.id Identificador de la variable
+ * @param {Expresion[]} options.pos Posiciones del arreglo
     */
-    constructor({ id }) {
+    constructor({ id, pos }) {
         super();
         
         /**
@@ -310,6 +311,13 @@ export class ReferenciaVariable extends Expresion {
          * @type {string}
         */
         this.id = id;
+
+
+        /**
+         * Posiciones del arreglo
+         * @type {Expresion[]}
+        */
+        this.pos = pos;
 
     }
 

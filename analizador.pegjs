@@ -77,12 +77,12 @@ Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
 
 Expresion = Asignacion
 
-Asignacion =  Ternario
+Asignacion = id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) _ "=" _ asg:Expresion {return crearNodo('asignacionArreglo',{id, pos, asg})}
             / id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
-            / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
-            / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id}),der:exp}) })}
-            / id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:("[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) _ "=" _ asg:Expresion {return crearNodo('asignacionArreglo',{id, pos, asg})}
+            / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id, pos:[]}),der:exp}) })}
+            / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id,pos:[]}),der:exp}) })}
             / Logico
+            / Ternario
 
 Ternario = condi:Logico _ "?" _ exp1:Logico _ ":" _ exp2:Logico { return crearNodo('ternario', { condi, exp1, exp2 }) }
 
@@ -156,6 +156,7 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
           / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
+          / id: Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) {return crearNodo('referenciaVariable', {id, pos}) }
           / Primitivos
 
 Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
@@ -164,7 +165,7 @@ Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('pr
     / Cadena
     / "(" exp:Expresion ")" { return crearNodo('agrupacion', { exp })}
     / "{" _ exp1:Expresion _ vls:("," _ exp:Expresion _ {return exp})* _ "}" { return crearNodo('arreglo',{vls: [exp1, ...vls]} ) }
-    / id: Identificador { return crearNodo('referenciaVariable', { id }) }
+    / id: Identificador { return crearNodo('referenciaVariable', { id, pos:[] }) }
 
 Cadena = "\"" contenido:[^"]* "\""{ var text = contenido.join(""); 
             text = text.replace(/\\n/g, "\n");
