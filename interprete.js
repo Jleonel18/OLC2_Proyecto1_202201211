@@ -422,11 +422,7 @@ visitDeclaracionVariable(node) {
                 if(!Array.isArray(variable.valor)){
                     throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo`);
                 }
-
-                if(Array.isArray(variable.valor[expresion.valor])){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo de una dimensión`);
-                }
-
+                
                 if(expresion.tipo != "int"){
                     throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero`);
                 }
@@ -880,6 +876,10 @@ visitAsignacion(node) {
 
         if(!Array.isArray(copiaArreglo.valor)){
             throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
+        }
+
+        if(Array.isArray(copiaArreglo.valor[0])){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo de una dimensión`);
         }
 
         if(tipo == "float" && copiaArreglo.tipo == "int"){

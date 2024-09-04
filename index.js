@@ -48,9 +48,6 @@ btn.addEventListener('click', () => {
         console.log("Salida:", interprete.salida);
         salida.textContent = interprete.salida;
     }catch(e){
-        //console.log(JSON.stringify(e,null,2));
-        //console.log(e.message);
-        
 
         if(e instanceof SemanticError){
             addError(e.tipo, e.linea, e.columna, e.message);
@@ -63,7 +60,6 @@ btn.addEventListener('click', () => {
             console.log(e);
         }
         
-        //console.log(errores);
     }
     
 });
