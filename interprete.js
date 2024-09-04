@@ -83,7 +83,7 @@ export class InterpreterVisitor extends BaseVisitor{
                     switch (`${izq.tipo}-${der.tipo}`) {
                         case "int-int":
                             // Realiza la división y redondea el resultado a un entero
-                            const divisionInt = Math.round(izq.valor / der.valor);
+                            const divisionInt = Math.floor(izq.valor / der.valor);
                             return { valor: divisionInt, tipo: "int" };
                         
                         case "int-float":

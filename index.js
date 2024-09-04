@@ -60,6 +60,7 @@ btn.addEventListener('click', () => {
             const columna = e.location ? e.location.start.column: 'Desconocida';
             salida.textContent = `Error léxico/sintáctico: ${e.message} en linea: ${linea} columna: ${columna}`;
             addError('Léxico/Sintáctico:', linea, columna, e.message);
+            console.log(e);
         }
         
         //console.log(errores);

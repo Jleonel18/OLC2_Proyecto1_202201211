@@ -46,7 +46,7 @@ VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return e
         / "var" _ id:Identificador _ "=" _ exp:Expresion ";" { return crearNodo('declaracionVariable', { id, exp }) }
 TipoDato = "int" / "float" / "string" / "boolean" / "char"
 
-Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
+Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
     / "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
     stmtElse:( 
@@ -69,7 +69,7 @@ ForInic = dc:VarDcl { return dc }
 Cases = "case" _ exp:Expresion _ ":" _ stmt:( _ stmt:Stmt _ {return stmt})* _ { return { exp, stmt } }
 Defaul = "default" _ ":" _ stmt:(_ stmt: Stmt _ {return stmt})*_ { return stmt  }
 
-Arreglo = tipo:TipoDato _ "[" _ "]" _ id:Identificador _ "=" _ id2: Identificador _ ";" {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, exp:undefined, exps:undefined})})}
+Arreglo = tipo:TipoDato _ "[" _ "]" _ id:Identificador _ "=" _ id2: Identificador _ ";" {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, pos:[]})})}
           / tipo:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ valores:Expresion _ ";" {return crearNodo('arregloVal', {tipo, id, tmn, valores})}
           / tipo1:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ tamanos:("[" _ vl1:Expresion _ "]" _ vl2:( _ "[" _ v:Expresion _ "]" {return v})* {return [vl1, ...vl2] }) _ ";" {return crearNodo('arrregloVacio',{tipo1, tmn, id, tipo2, tamanos})}
 

@@ -185,7 +185,7 @@ function peg$parse(input, options) {
   var peg$c5 = "string";
   var peg$c6 = "boolean";
   var peg$c7 = "char";
-  var peg$c8 = "print(";
+  var peg$c8 = "System.out.println(";
   var peg$c9 = ",";
   var peg$c10 = ")";
   var peg$c11 = "{";
@@ -253,7 +253,7 @@ function peg$parse(input, options) {
   var peg$e5 = peg$literalExpectation("string", false);
   var peg$e6 = peg$literalExpectation("boolean", false);
   var peg$e7 = peg$literalExpectation("char", false);
-  var peg$e8 = peg$literalExpectation("print(", false);
+  var peg$e8 = peg$literalExpectation("System.out.println(", false);
   var peg$e9 = peg$literalExpectation(",", false);
   var peg$e10 = peg$literalExpectation(")", false);
   var peg$e11 = peg$literalExpectation("{", false);
@@ -341,7 +341,7 @@ function peg$parse(input, options) {
   var peg$f23 = function(exp, stmt) { return { exp, stmt } };
   var peg$f24 = function(stmt) {return stmt};
   var peg$f25 = function(stmt) { return stmt  };
-  var peg$f26 = function(tipo, id, id2) {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, exp:undefined, exps:undefined})})};
+  var peg$f26 = function(tipo, id, id2) {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, pos:[]})})};
   var peg$f27 = function(tipo, vl1, v) {return v};
   var peg$f28 = function(tipo, vl1, vl2) {return [vl1, ...vl2]};
   var peg$f29 = function(tipo, tmn, id, valores) {return crearNodo('arregloVal', {tipo, id, tmn, valores})};
@@ -831,9 +831,9 @@ function peg$parse(input, options) {
     var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15;
 
     s0 = peg$currPos;
-    if (input.substr(peg$currPos, 6) === peg$c8) {
+    if (input.substr(peg$currPos, 19) === peg$c8) {
       s1 = peg$c8;
-      peg$currPos += 6;
+      peg$currPos += 19;
     } else {
       s1 = peg$FAILED;
       if (peg$silentFails === 0) { peg$fail(peg$e8); }
