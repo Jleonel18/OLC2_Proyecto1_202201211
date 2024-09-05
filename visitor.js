@@ -81,6 +81,12 @@
 
  * @typedef {import('./nodos').Decremento} Decremento
 
+
+ * @typedef {import('./nodos').DeclFuncion} DeclFuncion
+
+
+ * @typedef {import('./nodos').Llamada} Llamada
+
  */
 
 
@@ -331,6 +337,24 @@ export class BaseVisitor {
      */
     visitDecremento(node) {
         throw new Error('Metodo visitDecremento no implementado');
+    }
+    
+
+    /**
+     * @param {DeclFuncion} node
+     * @returns {any}
+     */
+    visitDeclFuncion(node) {
+        throw new Error('Metodo visitDeclFuncion no implementado');
+    }
+    
+
+    /**
+     * @param {Llamada} node
+     * @returns {any}
+     */
+    visitLlamada(node) {
+        throw new Error('Metodo visitLlamada no implementado');
     }
     
 }

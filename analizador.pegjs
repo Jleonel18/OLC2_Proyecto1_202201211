@@ -27,7 +27,9 @@
       'arregloVal': nodos.ArregloVal,
       'copiarArreglo': nodos.CopiarArreglo,
       'arrregloVacio': nodos.ArregloVacio,
-      'asignacionArreglo': nodos.AsignacionArreglo
+      'asignacionArreglo': nodos.AsignacionArreglo,
+      'declFuncion': nodos.DeclFuncion,
+      'llamada': nodos.Llamada
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -40,14 +42,21 @@ programa = _ dcl:Declaracion* _ { return dcl }
 
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
+            / dcl:FuncDcl _ { return dcl }
             / arreglo:Arreglo _ { return arreglo }
 
 VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return exp})?";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
         / "var" _ id:Identificador _ "=" _ exp:Expresion ";" { return crearNodo('declaracionVariable', { id, exp }) }
 TipoDato = "int" / "float" / "string" / "boolean" / "char"
 
-Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
-    / "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
+FuncDcl = tipo:(TipoDato/"void") _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque: Bloque {return crearNodo('declFuncion', {tipo, id, params: params || [] , bloque})}
+
+Parametros = param1:Parameters params:("," _ param:Parameters {return param; })* {return [param1, ...params]; }
+Parameters = tipo:TipoDato dimen:Dimensiones? _ id:Identificador {return {tipo, id, dim:dimen || ""};}
+Dimensiones = "[" _ "]" {return text();}
+
+Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
+    / Bloque
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
     stmtElse:( 
       _ "else" _ stmtElse:Stmt { return stmtElse }
@@ -62,6 +71,8 @@ Stmt = "print(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")
     / "return" _ exp:Expresion? _ ";" { return crearNodo('return', { exp }) }
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
 
+Bloque = "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
+
 ForInic = dc:VarDcl { return dc }
         / exp:Expresion _ ";" { return exp }
         / ";" { return null }
@@ -73,7 +84,7 @@ Arreglo = tipo:TipoDato _ "[" _ "]" _ id:Identificador _ "=" _ id2: Identificado
           / tipo:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ valores:Expresion _ ";" {return crearNodo('arregloVal', {tipo, id, tmn, valores})}
           / tipo1:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ "new" _ tipo2:TipoDato _ tamanos:("[" _ vl1:Expresion _ "]" _ vl2:( _ "[" _ v:Expresion _ "]" {return v})* {return [vl1, ...vl2] }) _ ";" {return crearNodo('arrregloVacio',{tipo1, tmn, id, tipo2, tamanos})}
 
-Identificador = [a-zA-Z][a-zA-Z0-9]* { return text() }
+Identificador = [a-zA-Z_][a-zA-Z0-9_]* { return text() }
 
 Expresion = Asignacion
 
@@ -150,14 +161,26 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
           / "toUpperCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toUpperCase', exp }) }
           / "toLowerCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toLowerCase', exp }) }
           / "parseInt(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseInt', exp }) }
-          / "parseFloat(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseFloat', exp }) }
+          / "parsefloat(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseFloat', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
+          / Llamada
           / "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
           / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
           / id: Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) {return crearNodo('referenciaVariable', {id, pos}) }
           / Primitivos
+
+Llamada = callee:Primitivos _ params:( "(" _ args:Argumentos? _ ")" {return args})* {
+  return params.reduce(
+    (callee, args) => {
+      return crearNodo('llamada', { callee, args: args || [] })
+    },
+    callee
+  )
+}
+
+Argumentos = arg:Expresion _ args:("," _ exp:Expresion _ {return exp})* { return [arg, ...args] }
 
 Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
     / bool:("true"/"false") { return bool == "true" ? crearNodo('primitivo', { valor: true, tipo: 'boolean' }) : crearNodo('primitivo', { valor: false, tipo: 'boolean' }) }

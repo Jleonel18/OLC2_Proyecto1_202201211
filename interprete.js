@@ -1,7 +1,9 @@
 import { Entorno } from "./entorno.js";
 import { BaseVisitor } from "./visitor.js";
 import nodos,{ Expresion } from "./nodos.js";
-import { BreakException, ContinueException, SemanticError } from "./transfer.js";
+import { BreakException, ContinueException, SemanticError, ReturnException } from "./transfer.js";
+import { Foreign } from "./foreign.js";
+import { Invocar } from "./invocar.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
@@ -677,7 +679,7 @@ visitAsignacion(node) {
      */
     visitReturn(node) {
         let v = null;
-        if(node.accept(this)){
+        if(node.exp){
             v = node.exp.accept(this);
         }
 
@@ -891,6 +893,44 @@ visitAsignacion(node) {
             const copiar = [...copiaArreglo.valor];
             this.entornoActual.setVariable(tipo,id,copiar);
         }
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclFuncion']}
+     */
+    visitDeclFuncion(node) {
+
+        const noParams = node.params.map(param=> param.id);
+        const unico = new Set(noParams);
+
+        if(noParams.length != unico.size){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`Hay parámetros repetidos en la función`);
+        }
+
+        const funcion = new Foreign(node, this.entornoActual);
+
+        console.log(this.entornoActual)
+        this.entornoActual.setVariable(node.tipo,node.id,funcion);
+
+    }
+
+    /**
+     * @type {BaseVisitor['visitLlamada']}
+     */
+    visitLlamada(node) {
+        const funcion = node.callee.accept(this).valor;
+        const args = node.args.map(arg => arg.accept(this));
+
+        if(!(funcion instanceof Invocar)){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`La variable no es una función`);
+        }
+        
+        if(funcion.aridad() !== args.length){
+            throw new SemanticError(node.location.start.line,node.location.start.column,`La cantidad de argumentos no coincide con la cantidad de parámetros`);
+        }
+
+        return funcion.invocar(this,args);
 
     }
 

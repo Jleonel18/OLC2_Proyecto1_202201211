@@ -935,4 +935,86 @@ export class Decremento extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento }
+export class DeclFuncion extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador de la funcion
+ * @param {string[]} options.params Parametros de la funcion
+ * @param {string} options.tipo Tipo de retorno de la funcion
+ * @param {Bloque} options.bloque Bloque de la funcion
+    */
+    constructor({ id, params, tipo, bloque }) {
+        super();
+        
+        /**
+         * Identificador de la funcion
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Parametros de la funcion
+         * @type {string[]}
+        */
+        this.params = params;
+
+
+        /**
+         * Tipo de retorno de la funcion
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Bloque de la funcion
+         * @type {Bloque}
+        */
+        this.bloque = bloque;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclFuncion(this);
+    }
+}
+    
+export class Llamada extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.callee Funcion a llamar
+ * @param {Expresion[]} options.args Argumentos de la funcion
+    */
+    constructor({ callee, args }) {
+        super();
+        
+        /**
+         * Funcion a llamar
+         * @type {Expresion}
+        */
+        this.callee = callee;
+
+
+        /**
+         * Argumentos de la funcion
+         * @type {Expresion[]}
+        */
+        this.args = args;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitLlamada(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada }
