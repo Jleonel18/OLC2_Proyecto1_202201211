@@ -55,7 +55,7 @@ Parametros = param1:Parameters params:("," _ param:Parameters {return param; })*
 Parameters = tipo:TipoDato dimen:Dimensiones? _ id:Identificador {return {tipo, id, dim:dimen || ""};}
 Dimensiones = "[" _ "]" {return text();}
 
-Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* ")" _ ";" { return crearNodo('print', { exp, exps }) }
+Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* _ ")" _ ";" { return crearNodo('print', { exp, exps }) }
     / Bloque
     / "if" _ "(" _ cond:Expresion _ ")" _ stmtT:Stmt 
     stmtElse:( 
@@ -163,12 +163,12 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
           / "parseInt(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseInt', exp }) }
           / "parsefloat(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseFloat', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
-          / Llamada
-          / "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
-          / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
-          / id: Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) {return crearNodo('referenciaVariable', {id, pos}) }
+          / id: Identificador _ pos:("[" _ val:Expresion _ "]" val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) {return crearNodo('referenciaVariable', {id, pos}) }
+          / "-" _ num:Unaria { return crearNodo('unaria', { op: '-', exp: num }) }
+          / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
+          / Llamada
           / Primitivos
 
 Llamada = callee:Primitivos _ params:( "(" _ args:Argumentos? _ ")" {return args})* {
