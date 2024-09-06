@@ -29,7 +29,8 @@
       'arrregloVacio': nodos.ArregloVacio,
       'asignacionArreglo': nodos.AsignacionArreglo,
       'declFuncion': nodos.DeclFuncion,
-      'llamada': nodos.Llamada
+      'llamada': nodos.Llamada,
+      'arregloFunc': nodos.ArregloFunc
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -157,7 +158,11 @@ Multiplicacion = izq:Unaria expansion:(
     )
 }
 
-Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toString', exp }) }
+Unaria =   id: Identificador "." op:FuncArreglo _ {return crearNodo('arregloFunc',{
+            id:crearNodo('referenciaVariable', {id:id, pos:[]}),op, params: undefined})}
+          /id: Identificador "." op:"indexOf" "(" _ params:Expresion _ ")" _ {return crearNodo('arregloFunc',{
+            id:crearNodo('referenciaVariable',{id:id, pos:[]}),op,params})} 
+          /"toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toString', exp }) }
           / "toUpperCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toUpperCase', exp }) }
           / "toLowerCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toLowerCase', exp }) }
           / "parseInt(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseInt', exp }) }
@@ -170,6 +175,8 @@ Unaria = "toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'to
           / "!" _ exp:Unaria { return crearNodo('unaria', { op: '!', exp }) }
           / Llamada
           / Primitivos
+
+FuncArreglo = "length" / "join()"
 
 Llamada = callee:Primitivos _ params:( "(" _ args:Argumentos? _ ")" {return args})* {
   return params.reduce(

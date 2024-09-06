@@ -87,6 +87,9 @@
 
  * @typedef {import('./nodos').Llamada} Llamada
 
+
+ * @typedef {import('./nodos').ArregloFunc} ArregloFunc
+
  */
 
 
@@ -355,6 +358,15 @@ export class BaseVisitor {
      */
     visitLlamada(node) {
         throw new Error('Metodo visitLlamada no implementado');
+    }
+    
+
+    /**
+     * @param {ArregloFunc} node
+     * @returns {any}
+     */
+    visitArregloFunc(node) {
+        throw new Error('Metodo visitArregloFunc no implementado');
     }
     
 }

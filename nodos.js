@@ -1017,4 +1017,45 @@ export class Llamada extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada }
+export class ArregloFunc extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {any} options.id Identificador del arreglo
+ * @param {string} options.op Operador del arreglo
+ * @param {any | undefined} options.params Expresion del arreglo
+    */
+    constructor({ id, op, params }) {
+        super();
+        
+        /**
+         * Identificador del arreglo
+         * @type {any}
+        */
+        this.id = id;
+
+
+        /**
+         * Operador del arreglo
+         * @type {string}
+        */
+        this.op = op;
+
+
+        /**
+         * Expresion del arreglo
+         * @type {any | undefined}
+        */
+        this.params = params;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitArregloFunc(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada, ArregloFunc }

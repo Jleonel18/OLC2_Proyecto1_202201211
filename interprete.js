@@ -897,6 +897,37 @@ visitAsignacion(node) {
     }
 
     /**
+     * @type {BaseVisitor['visitArregloFunc']}
+     */
+    visitArregloFunc(node){
+        const arr = node.id.accept(this).valor;
+
+        switch(node.op){
+            case "length":
+                const len = arr.length;
+                return {valor:len,tipo:"int"};
+            case "join()":
+                let str = "";
+                for(let i =0; i<arr.length; i++){
+                    str += arr[i].toString();
+                    if(i < arr.length-1){
+                        str += ",";
+                    }
+                }
+                return {valor:str,tipo:"string"};
+            case "indexOf":
+                const valor = node.params.valor
+                for(let i =0; i<arr.length; i++){
+                    const e = arr[i];
+                    if(e == valor){
+                        return {valor:i,tipo:"int"};
+                    }
+                }
+                return {valor:-1,tipo:"int"};
+        }
+    }
+
+    /**
      * @type {BaseVisitor['visitDeclFuncion']}
      */
     visitDeclFuncion(node) {
