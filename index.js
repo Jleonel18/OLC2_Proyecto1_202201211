@@ -98,7 +98,7 @@ function actualizarTablaErrores() {
     });
 }
 
-function actualizarTablaSimbolos() {
+/*function actualizarTablaSimbolos() {
     const tbody = document.querySelector("#modalVariables tbody");
     tbody.innerHTML = ""; // Limpiar contenido previo de la tabla
 
@@ -122,7 +122,41 @@ function actualizarTablaSimbolos() {
 
         tbody.appendChild(fila);
     });
+}*/
+
+function actualizarTablaSimbolos() {
+    const tbody = document.querySelector("#modalVariables tbody");
+    tbody.innerHTML = ""; // Limpiar contenido previo de la tabla
+
+    const nombresAgregados = new Set(); // Conjunto para almacenar nombres únicos
+
+    Entorno.listaVariables.forEach((error, index) => {
+        if (!nombresAgregados.has(error.nombre)) { // Si el nombre no ha sido agregado
+            const fila = document.createElement("tr");
+
+            const celdaTipo = document.createElement("td");
+            celdaTipo.textContent = error.tipo;
+            fila.appendChild(celdaTipo);
+
+            const celdaNombre = document.createElement("td");
+            celdaNombre.textContent = error.nombre;
+            fila.appendChild(celdaNombre);
+
+            if (String(error.valor) === "[object Object]") {
+                error.valor = "funcion";
+            }
+            const celdaValor = document.createElement("td");
+            celdaValor.textContent = error.valor;
+            fila.appendChild(celdaValor);
+
+            tbody.appendChild(fila);
+
+            // Agregar el nombre al conjunto para evitar duplicados
+            nombresAgregados.add(error.nombre);
+        }
+    });
 }
+
 
 
 export function addError(tipo,linea,columna, descripcion){
