@@ -1,4 +1,5 @@
 import { parse } from './analizador.js';
+import { Entorno } from './entorno.js';
 import { InterpreterVisitor } from './interprete.js';
 import { SemanticError } from './transfer.js';
 
@@ -29,11 +30,17 @@ reportButton.addEventListener('click', () => {
     actualizarTablaErrores(); 
 });
 
+const variablesButton = document.getElementById('variablesButton');
+variablesButton.addEventListener('click', () => {
+    actualizarTablaSimbolos();
+});
+
 
 btn.addEventListener('click', () => {
 
     const codigoFuente = editor.value;
     errores.length = 0;
+    Entorno.listaVariables.length = 0;
 
     try{
         
@@ -86,6 +93,32 @@ function actualizarTablaErrores() {
         const celdaDescripcion = document.createElement("td");
         celdaDescripcion.textContent = error.descripcion;
         fila.appendChild(celdaDescripcion);
+
+        tbody.appendChild(fila);
+    });
+}
+
+function actualizarTablaSimbolos() {
+    const tbody = document.querySelector("#modalVariables tbody");
+    tbody.innerHTML = ""; // Limpiar contenido previo de la tabla
+
+    Entorno.listaVariables.forEach((error, index) => {
+        const fila = document.createElement("tr");
+
+        const celdaTipo = document.createElement("td");
+        celdaTipo.textContent = error.tipo;
+        fila.appendChild(celdaTipo);
+
+        const celdaNombre = document.createElement("td");
+        celdaNombre.textContent = error.nombre;
+        fila.appendChild(celdaNombre);
+
+        if (String(error.valor) === "[object Object]") {
+            error.valor = "funcion";
+        }
+        const celdaValor = document.createElement("td");
+        celdaValor.textContent = error.valor;
+        fila.appendChild(celdaValor);
 
         tbody.appendChild(fila);
     });

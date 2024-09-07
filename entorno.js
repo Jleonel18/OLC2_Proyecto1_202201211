@@ -1,6 +1,9 @@
 import { SemanticError } from "./transfer.js";
 
 export class Entorno {
+
+    static listaVariables = [];
+
     constructor(padre = undefined) {
         this.valores = {}
         this.padre = padre
@@ -17,6 +20,7 @@ export class Entorno {
         }
 
         this.valores[nombre] = {valor,tipo}
+        Entorno.listaVariables.push({tipo,nombre,valor});
     }
 
     /**
