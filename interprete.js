@@ -957,9 +957,16 @@ visitAsignacion(node) {
             throw new SemanticError(node.location.start.line,node.location.start.column,`La variable no es una función`);
         }
         
-        if(funcion.aridad() !== args.length){
+        if(funcion.aridad().length !== args.length){
             throw new SemanticError(node.location.start.line,node.location.start.column,`La cantidad de argumentos no coincide con la cantidad de parámetros`);
         }
+
+        args.forEach((arg, indice) => {
+            const tipo = funcion.aridad()[indice]
+            if(tipo.tipo != arg.tipo){
+                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de argumento no coincide con el tipo del parámetro`);
+            }
+        })
 
         return funcion.invocar(this,args);
 

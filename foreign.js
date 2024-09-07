@@ -19,7 +19,7 @@ export class Foreign extends Invocar{
     }
 
     aridad(){
-        return this.nodo.params.length;
+        return this.nodo.params;
     }
 
     /**
