@@ -13,20 +13,20 @@ export class Entorno {
      * @param {string} nombre
      * @param {any} valor
      */
-    setVariable(tipo, nombre, valor) {
+    setVariable(tipo, nombre, valor,linea,columna) {
 
         if(this.valores[nombre] != undefined) {
-            throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} ya definida`)
+            throw new SemanticError(linea,columna,`Variable ${nombre} ya definida`)
         }
 
-        this.valores[nombre] = {valor,tipo}
-        Entorno.listaVariables.push({tipo,nombre,valor});
+        this.valores[nombre] = {valor,tipo,linea,columna};
+        Entorno.listaVariables.push({tipo,nombre,valor,linea,columna});
     }
 
     /**
      * @param {string} nombre
      */
-    getVariable(nombre) {
+    getVariable(nombre,linea,columna) {
         const valorAct = this.valores[nombre];
 
         if(valorAct != undefined) {
@@ -34,75 +34,74 @@ export class Entorno {
         }
 
         if(!valorAct && this.padre) {
-            return this.padre.getVariable(nombre);
+            return this.padre.getVariable(nombre,linea,columna);
         }
 
-        throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`)
+        throw new SemanticError(linea,columna,`Variable ${nombre} no definida`)
     }
 
 /**
  * @param {string} nombre
  * @param {any} valor
  */
-updateVariable(nombre, valor) {
+updateVariable(nombre, valor,linea,columna) {
     const valorAct = this.valores[nombre];
-
-    //console.log("El tipo de la variable es: ", valorAct);
-    //console.log("El tipo del valor es: ", valor.tipo);
 
     if (valorAct != undefined) {
         if (valorAct.tipo === "string" && valor.tipo !== "string") {
-            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`)
+            throw new SemanticError(linea,columna,`El tipo de la variable ${nombre} es 'string' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "char" && valor.tipo !== "char") {
-            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'char' y no coincide con el tipo del valor proporcionado.`)
+            throw new SemanticError(linea,columna,`El tipo de la variable ${nombre} es 'char' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "int" && valor.tipo !== "int") {
-            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'int' y no coincide con el tipo del valor proporcionado.`)
+            throw new SemanticError(linea,columna,`El tipo de la variable ${nombre} es 'int' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "float" && (valor.tipo !== "float" && valor.tipo !== "int")) {
-            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'float' y no coincide con el tipo del valor proporcionado.`)
+            throw new SemanticError(linea,columna,`El tipo de la variable ${nombre} es 'float' y no coincide con el tipo del valor proporcionado.`)
         }
 
         if (valorAct.tipo === "boolean" && valor.tipo !== "boolean") {
-            throw new SemanticError('Indefinida','Indefinida',`El tipo de la variable ${nombre} es 'boolean' y no coincide con el tipo del valor proporcionado.`)
+            throw new SemanticError(linea,columna,`El tipo de la variable ${nombre} es 'boolean' y no coincide con el tipo del valor proporcionado.`)
         }
 
         // Asignar el valor si las condiciones se cumplen
         this.valores[nombre].valor = valor.valor;
         this.valores[nombre].tipo = valor.tipo; // Actualizar tipo si hay conversión implícita
+        this.valores[nombre].linea = linea;
+        this.valores[nombre].columna = columna;
         return;
     }
 
     // Si no se encuentra en el entorno actual, buscar en el entorno padre
     if (!valorAct && this.padre) {
-        this.padre.updateVariable(nombre, valor);
+        this.padre.updateVariable(nombre, valor,linea,columna);
         return;
     }
 
-    throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`)
+    throw new SemanticError(linea,columna,`Variable ${nombre} no definida`)
 }
 
 
-    updateVariableArreglo(nombre,valor,indice){
+    updateVariableArreglo(nombre,valor,indice,linea,columna){
         const actual = this.valores[nombre];
 
         if(actual != undefined){
-            if('temp' in actual.valor){
+            /*if('temp' in actual.valor){
                 throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} es temporal`)
-            }
+            }*/
 
-            if(!Array.isArray(actual.valor))  throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo`);
-            if(Array.isArray(actual.valor[indice.valor])) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo de arreglos`);
-            if(indice.valor >= actual.valor.length) throw new SemanticError('Indefinida','Indefinida',`Indice fuera de rango`);
+            if(!Array.isArray(actual.valor))  throw new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo`);
+            if(Array.isArray(actual.valor[indice.valor])) throw new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo de arreglos`);
+            if(indice.valor >= actual.valor.length) throw new SemanticError(linea,columna,`Indice fuera de rango`);
 
             if(valor.tipo == "int" && actual.tipo == "float"){
                 this.valores[nombre].valor[indice.valor] = valor.valor;
             }else if(actual.tipo != valor.tipo){
-                throw new SemanticError('Indefinida','Indefinida',`Tipo de dato incorrecto para la variable ${nombre}`);
+                throw new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
             }
 
             this.valores[nombre].valor[indice.valor] = valor.valor;
@@ -111,19 +110,19 @@ updateVariable(nombre, valor) {
         }
 
         if(!actual && this.padre){
-            this.padre.updateVariableArreglo(nombre,valor,indice);
+            this.padre.updateVariableArreglo(nombre,valor,indice,linea,columna);
             return;
         }
 
-        throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no definida`);
+        throw new SemanticError(linea,columna,`Variable ${nombre} no definida`);
     }
 
-    updateVariableMatriz(nombre,valor,posicion){
+    updateVariableMatriz(nombre,valor,posicion,linea,columna){
         const act = this.valores[nombre];
         
         if(act!= undefined){
-            if('temp' in act) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} es temporal`);
-        if(!Array.isArray(act.valor)) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo`);
+            if('temp' in act) throw new SemanticError(linea,columna,`Variable ${nombre} es temporal`);
+        if(!Array.isArray(act.valor)) throw new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo`);
 
         let arregloPivote = act.valor;
 
@@ -131,17 +130,17 @@ updateVariable(nombre, valor) {
 
             const expr = posicion[i];
 
-            if(!Array.isArray(arregloPivote)) throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} no es un arreglo de arreglos`);
+            if(!Array.isArray(arregloPivote)) throw new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo de arreglos`);
 
-            if(expr.tipo !== "int") throw new SemanticError('Indefinida','Indefinida',`Indice de matriz no es entero`);
+            if(expr.tipo !== "int") throw new SemanticError(linea,columna,`Indice de matriz no es entero`);
 
-            if(expr.valor >= arregloPivote.length) throw new SemanticError('Indefinida','Indefinida',`Indice fuera de rango`);
+            if(expr.valor >= arregloPivote.length) throw new SemanticError(linea,columna,`Indice fuera de rango`);
 
             if(i === posicion.length -1){
                 if(valor.tipo == "int" && act.tipo == "float"){
                     arregloPivote[expr.valor] = valor.valor;
                     return
-                }else if(act.tipo != valor.tipo) throw new SemanticError('Indefinida','Indefinida',`Tipo de dato incorrecto para la variable ${nombre}`);
+                }else if(act.tipo != valor.tipo) throw new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
                 arregloPivote[expr.valor] = valor.valor;
             }else{
                 arregloPivote = arregloPivote[expr.valor];
@@ -153,7 +152,7 @@ updateVariable(nombre, valor) {
         }
 
         if(!act && this.padre){
-            this.padre.updateVariableMatriz(nombre,valor,posicion);
+            this.padre.updateVariableMatriz(nombre,valor,posicion,linea,columna);
             return;
         }
 

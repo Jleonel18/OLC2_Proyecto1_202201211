@@ -149,6 +149,14 @@ function actualizarTablaSimbolos() {
             celdaValor.textContent = error.valor;
             fila.appendChild(celdaValor);
 
+            const celdaLinea = document.createElement("td");
+            celdaLinea.textContent = error.linea;
+            fila.appendChild(celdaLinea);
+
+            const celdaColumna = document.createElement("td");
+            celdaColumna.textContent = error.columna;
+            fila.appendChild(celdaColumna);
+
             tbody.appendChild(fila);
 
             // Agregar el nombre al conjunto para evitar duplicados

@@ -32,7 +32,7 @@ export class Foreign extends Invocar{
             /*console.log("El param id es:", param.id);
             console.log("El param tipo es:", param.tipo);
             console.log("El param valor es:", args[i].valor);*/
-            entornoNuevo.setVariable(param.tipo,param.id, args[i].valor);
+            entornoNuevo.setVariable(param.tipo,param.id, args[i].valor,this.nodo.location.start.line,this.nodo.location.start.column);
         })
 
         const entornoAnteriorLlamada = interprete.entornoActual;

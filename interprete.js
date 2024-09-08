@@ -339,27 +339,27 @@ visitTipoVariable(node) {
             if (tipoVar !== valor.tipo) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "float") {
             if (tipoVar !== valor.tipo && valor.tipo !== "int") {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "string") {
             if (tipoVar !== valor.tipo) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "boolean") {
             if (tipoVar !== valor.tipo) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "char") {
             if (tipoVar !== valor.tipo) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor);
+            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else {
             throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
         }
@@ -386,7 +386,7 @@ visitTipoVariable(node) {
             throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
     }
 
-    this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado);
+    this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado,node.location.start.line,node.location.start.column);
 }
 
 
@@ -405,7 +405,7 @@ visitDeclaracionVariable(node) {
     const valorVariable = node.exp.accept(this);
     
     // Asignar la variable con el tipo y valor deducidos
-    this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor);
+    this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor,node.location.start.line,node.location.start.column);
 }
 
     
@@ -416,7 +416,7 @@ visitDeclaracionVariable(node) {
         const nombreVariable = node.id
         const pos = node.pos.map(p => p.accept(this));
 
-        const variable = this.entornoActual.getVariable(nombreVariable);
+        const variable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
 
         if(pos.length == 1){
                 
@@ -469,13 +469,13 @@ visitDeclaracionVariable(node) {
      */
     visitIncremento(node){
         const nombreVariable = node.id;
-        const valorVariable = this.entornoActual.getVariable(nombreVariable);
+        const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
             throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
         }
 
-        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo});
+        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
         return {valor:valorVariable.valor + 1 , tipo: valorVariable.tipo};
     }
 
@@ -485,13 +485,13 @@ visitDeclaracionVariable(node) {
     visitDecremento(node){
 
         const nombreVariable = node.id;
-        const valorVariable = this.entornoActual.getVariable(nombreVariable);
+        const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
             throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
         }
 
-        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo});
+        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
         return {valor:valorVariable.valor - 1 , tipo: valorVariable.tipo};
     }
 
@@ -520,7 +520,7 @@ visitAsignacion(node) {
 
     const valorA = node.exp.accept(this);
 
-    this.entornoActual.updateVariable(node.id,valorA);
+    this.entornoActual.updateVariable(node.id,valorA,node.location.start.line,node.location.start.column);
     return valorA;
 }
 
@@ -539,7 +539,7 @@ visitAsignacion(node) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
             }
 
-            this.entornoActual.updateVariableArreglo(node.id,valor,expresion);
+            this.entornoActual.updateVariableArreglo(node.id,valor,expresion,node.location.start.line,node.location.start.column);
             return valor;
 
         }
@@ -551,12 +551,12 @@ visitAsignacion(node) {
                 }
             });
 
-            this.entornoActual.updateVariableMatriz(node.id,valor,pos);
+            this.entornoActual.updateVariableMatriz(node.id,valor,pos,node.location.start.line,node.location.start.column);
             return valor;
 
         }
 
-        this.entornoActual.updateVariable(node.id,valor);
+        this.entornoActual.updateVariable(node.id,valor,node.location.start.line,node.location.start.column);
         return valor;
 
     }
@@ -732,7 +732,7 @@ visitAsignacion(node) {
 
             })
 
-            this.entornoActual.setVariable(tipo, identificador, pivote);
+            this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
 
         }else{
 
@@ -759,7 +759,7 @@ visitAsignacion(node) {
                 throw new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no son correctas`);
             }
 
-            this.entornoActual.setVariable(tipo, identificador, pivote);
+            this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
 
         }
     }
@@ -829,7 +829,7 @@ visitAsignacion(node) {
             for(let i = 0; i < tamanos[0].valor; i++){
                 pivote[i] = valorAsignar;
             }
-            this.entornoActual.setVariable(tipo1,id,pivote);
+            this.entornoActual.setVariable(tipo1,id,pivote,node.location.start.line,node.location.start.column);
 
         }else{
 
@@ -861,7 +861,7 @@ visitAsignacion(node) {
                 );
             };
 
-            this.entornoActual.setVariable(tipo1,id,matrizAsignar(tamanos));
+            this.entornoActual.setVariable(tipo1,id,matrizAsignar(tamanos),node.location.start.line,node.location.start.column);
 
         }
 
@@ -886,12 +886,12 @@ visitAsignacion(node) {
 
         if(tipo == "float" && copiaArreglo.tipo == "int"){
             const copiar = [...copiaArreglo.valor];
-            this.entornoActual.setVariable(tipo,id,copiar);
+            this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
         }else if(tipo != copiaArreglo.tipo){
             throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
         }else{
             const copiar = [...copiaArreglo.valor];
-            this.entornoActual.setVariable(tipo,id,copiar);
+            this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
         }
 
     }
@@ -942,7 +942,7 @@ visitAsignacion(node) {
         const funcion = new Foreign(node, this.entornoActual);
 
         console.log(this.entornoActual)
-        this.entornoActual.setVariable(node.tipo,node.id,funcion);
+        this.entornoActual.setVariable(node.tipo,node.id,funcion,node.location.start.line,node.location.start.column);
 
     }
 
