@@ -476,6 +476,12 @@ visitDeclaracionVariable(node) {
 
         const variable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
 
+        if(variable == undefined){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no está definida`);
+            errores.push(err);
+            return
+        }
+
         if(pos.length == 1){
                 
                 const expresion = pos[0];
@@ -563,9 +569,12 @@ visitDeclaracionVariable(node) {
      */
     visitPrint(node) {
         const valor = node.exp.accept(this);
-        this.salida += valor.valor + ' ';
+        if(valor != undefined){
+            this.salida += valor.valor + ' ';
         node.exps.forEach(exp => this.salida += exp.accept(this).valor + ' ');
         this.salida += '\n';
+        }
+        
     }
     
 
