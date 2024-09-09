@@ -8,7 +8,7 @@ const btn = document.getElementById('compileButton');
 const salida = document.getElementById('compiledOutput');
 const openFileInput = document.getElementById('openFile');
 
-const errores = [];
+export let errores = [];
 
 // Evento para el botón de elegir archivos
 openFileInput.addEventListener('change', (event) => {
@@ -39,7 +39,7 @@ variablesButton.addEventListener('click', () => {
 btn.addEventListener('click', () => {
 
     const codigoFuente = editor.value;
-    errores.length = 0;
+    errores = [];
     Entorno.listaVariables.length = 0;
 
     try{
@@ -91,7 +91,7 @@ function actualizarTablaErrores() {
         fila.appendChild(celdaColumna);
 
         const celdaDescripcion = document.createElement("td");
-        celdaDescripcion.textContent = error.descripcion;
+        celdaDescripcion.textContent = error.message;
         fila.appendChild(celdaDescripcion);
 
         tbody.appendChild(fila);
@@ -167,12 +167,12 @@ function actualizarTablaSimbolos() {
 
 
 
-export function addError(tipo,linea,columna, descripcion){
+export function addError(tipo,linea,columna, message){
     const error = {
         tipo,
         linea,
         columna,
-        descripcion
+        message
     }
     errores.push(error);
 }

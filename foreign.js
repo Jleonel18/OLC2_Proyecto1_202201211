@@ -1,4 +1,5 @@
 import { Entorno } from "./entorno.js";
+import { errores } from "./index.js";
 import { Invocar } from "./invocar.js";
 import { DeclFuncion } from "./nodos.js";
 import { BreakException, SemanticError, ReturnException, ContinueException } from "./transfer.js";
@@ -54,7 +55,8 @@ export class Foreign extends Invocar{
 
 
                 if(this.nodo.tipo != e.value.tipo){
-                    throw new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor de tipo ${this.nodo.tipo}`);
+                    let err = new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor de tipo ${this.nodo.tipo}`);
+                    errores.push(err);
                 }
 
                 return e.value;
@@ -62,11 +64,13 @@ export class Foreign extends Invocar{
 
 
             if(this.nodo.tipo != "void" && e instanceof BreakException){
-                throw new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+                let err = new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+                errores.push(err);
             }
 
             if(this.nodo.tipo != "void" && e instanceof ContinueException){
-                throw new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+                let err = new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+                errores.push(err);
             }
 
             throw e;
@@ -74,7 +78,8 @@ export class Foreign extends Invocar{
         }
 
         if(this.nodo.tipo != "void"){
-            throw new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+            let err = new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
+            errores.push(err);
         }
 
         interprete.entornoActual = entornoAnteriorLlamada;

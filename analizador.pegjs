@@ -40,11 +40,19 @@
 }
 
 programa = _ dcl:Declaracion* _ { return dcl }
-          /// struct:Struct* _ { return struct }
 
-//Struct = "struct" _ id:Identificador _ "{" _ params:ParamsStruct* _ "}" { return crearNodo('struct', { id, decl }) }
+/*Struct = "struct" _ id:Identificador _ "{" _ params:ParamsStruct* _ "}" _ ";" {
+  const structDef = {
+        id: id,
+        params: params.map(p => ({ tipo: p.tipo, id: p.id }))
+  };
 
-//ParamsStruct = tipo:TipoDato _ id:Identificador _ ";" { return crearNodo('tipoVariable', { tipo, id }) }*/
+  Entorno.setStruct(id, structDef);
+    
+  return structDef;
+}
+
+ParamsStruct = tipo:TipoDato _ id:Identificador _ ";" { return crearNodo('tipoVariable', { tipo, id }) }*/
 
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }

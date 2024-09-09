@@ -4,6 +4,7 @@ import nodos,{ Expresion } from "./nodos.js";
 import { BreakException, ContinueException, SemanticError, ReturnException } from "./transfer.js";
 import { Foreign } from "./foreign.js";
 import { Invocar } from "./invocar.js";
+import { errores } from "./index.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
@@ -39,6 +40,12 @@ export class InterpreterVisitor extends BaseVisitor{
         const izq = node.izq.accept(this);
         const der = node.der.accept(this);
 
+        if(izq.valor == null || der.valor == null){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+            errores.push(err);
+            
+        }
+
         switch(node.op) {
             case '+':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -51,7 +58,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "string-string":
                         return { valor: izq.valor + der.valor, tipo: "string" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
 
             case '-':
@@ -63,7 +71,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor - der.valor, tipo: "float" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '*': 
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -74,12 +83,14 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor * der.valor, tipo: "float" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
                 case '/':
                     // Verifica si el divisor es cero antes de realizar la división
                     if (der.valor === 0) {
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
+                        errores.push(err);
                     }
                 
                     switch (`${izq.tipo}-${der.tipo}`) {
@@ -95,7 +106,8 @@ export class InterpreterVisitor extends BaseVisitor{
                             return { valor: izq.valor / der.valor, tipo: "float" };
                         
                         default:
-                            throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                            errores.push(err);
                     }
             case '<':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -106,7 +118,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor < der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '>':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -117,7 +130,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor > der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '<=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -128,7 +142,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor <= der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '>=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -139,14 +154,16 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor >= der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '%': 
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
                         return { valor: izq.valor % der.valor, tipo: "int" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '==':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -159,7 +176,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor == der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '!=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -172,21 +190,24 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "char-char":
                         return { valor: izq.valor != der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '&&':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
                         return { valor: izq.valor && der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '||':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
                         return { valor: izq.valor || der.valor, tipo: "boolean" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '+=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -198,7 +219,8 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "string-string":
                         return { valor: izq.valor + der.valor, tipo: "string" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '-=':
                 switch (`${izq.tipo}-${der.tipo}`) {
@@ -208,9 +230,12 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-float":
                         return { valor: izq.valor - der.valor, tipo: "float" };
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
-            default: throw new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
+            default:
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
+                errores.push(err);
         }
     }
     
@@ -219,6 +244,12 @@ export class InterpreterVisitor extends BaseVisitor{
     */
     visitOperacionUnaria(node) {
         const exp = node.exp.accept(this);
+
+        if(exp.valor == null){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+            errores.push(err);
+        }
+
         switch(node.op) {
             case '-': 
                 switch(exp.tipo){
@@ -227,14 +258,16 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float":
                         return {valor: -exp.valor, tipo: exp.tipo}
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case '!':
                 switch(exp.tipo){
                     case "boolean":
                         return {valor: !exp.valor, tipo: exp.tipo}
                     default:
-                        throw new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
+                        errores.push(err);
                 }
             case 'typeof':
                 //console.log("el tipo es:",exp.tipo)
@@ -244,7 +277,8 @@ export class InterpreterVisitor extends BaseVisitor{
             case 'toUpperCase':
 
                 if(exp.tipo != "string"){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a mayúsculas un valor que no es de tipo string`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a mayúsculas un valor que no es de tipo string`);
+                    errores.push(err);
                 }
 
                 return {valor:exp.valor.toUpperCase(),tipo:'string'};
@@ -252,7 +286,8 @@ export class InterpreterVisitor extends BaseVisitor{
             case 'toLowerCase':
 
                 if(exp.tipo != "string"){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a minúsculas un valor que no es de tipo string`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a minúsculas un valor que no es de tipo string`);
+                    errores.push(err);
                 }
 
                 return {valor:exp.valor.toLowerCase(),tipo:'string'};
@@ -268,10 +303,11 @@ export class InterpreterVisitor extends BaseVisitor{
                         // Convertir a int redondeando hacia abajo
                         return { valor: Math.floor(num), tipo: 'int' };
                     }
+                }else{
+                    // Si no se puede convertir
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a int`);
+                    errores.push(err);
                 }
-            
-                // Si no se puede convertir
-                throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a int`);
                 
             case 'parseFloat':
                 // Verificar si el tipo es "string"
@@ -283,13 +319,15 @@ export class InterpreterVisitor extends BaseVisitor{
                     if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(exp.valor)) {
                         return { valor: num, tipo: 'float' };
                     }
+                }else{
+                    // Si no se puede convertir
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a float`);
+                    errores.push(err);
                 }
                 
-                // Si no se puede convertir
-                throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede convertir a float`);
-
-            default: 
-                throw new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
+            default:
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
+                errores.push(err); 
         }
     }
 
@@ -300,7 +338,8 @@ export class InterpreterVisitor extends BaseVisitor{
         const condicion = node.condi.accept(this);
 
         if(condicion.tipo != "boolean"){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`La condición del operador ternario debe ser de tipo boolean`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`La condición del operador ternario no es de tipo boolean`);
+            errores.push(err);
         }
 
         if(condicion.valor){
@@ -325,9 +364,9 @@ export class InterpreterVisitor extends BaseVisitor{
         return {valor:node.valor,tipo:node.tipo};
     }
 
-    /**
- * @type {BaseVisitor['visitTipoVariable']}
- */
+/**
+* @type {BaseVisitor['visitTipoVariable']}
+*/
 visitTipoVariable(node) {
     var tipoVar = node.tipo;
     const nombreVar = node.id;
@@ -335,33 +374,50 @@ visitTipoVariable(node) {
     if (node.exp) {
         const valor = node.exp.accept(this);
 
-        if (tipoVar === "int") {
-            if (tipoVar !== valor.tipo) {
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+        if (tipoVar == "int") {
+            if (tipoVar != valor.tipo) {
+                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                errores.push(err);
+
+            }else{
+                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "float") {
             if (tipoVar !== valor.tipo && valor.tipo !== "int") {
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                errores.push(err);
+                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+            }else{
+                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "string") {
             if (tipoVar !== valor.tipo) {
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                errores.push(err);
+                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+            }else{
+                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "boolean") {
             if (tipoVar !== valor.tipo) {
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                errores.push(err);
+                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+            }else{
+                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else if (tipoVar === "char") {
             if (tipoVar !== valor.tipo) {
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                errores.push(err);
+                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+            }else{
+                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-            this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
         } else {
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
+            errores.push(err);
         }
         
         return;
@@ -371,19 +427,20 @@ visitTipoVariable(node) {
     switch (tipoVar) {
         case "int":
         case "float":
-            valorPredeterminado = 0; // Asigna 0 tanto para int como para float
+            valorPredeterminado = null; // Valor predeterminado para int y float
             break;
         case "char":
-            valorPredeterminado = ''; // Asigna un carácter vacío para char
+            valorPredeterminado = null; 
             break;
         case "string":
-            valorPredeterminado = ""; // Asigna una cadena vacía para string
+            valorPredeterminado = null; 
             break;
         case "boolean":
-            valorPredeterminado = true; // Asigna true para boolean
+            valorPredeterminado = null; 
             break;
         default:
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Tipo ${tipoVar} no es valido`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
+            errores.push(err);
     }
 
     this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado,node.location.start.line,node.location.start.column);
@@ -398,7 +455,8 @@ visitDeclaracionVariable(node) {
     
     // Verificar si hay una expresión asignada
     if (!node.exp) {
-        throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no tiene una expresión asignada`);
+        let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no tiene un valor asignado`);
+        errores.push(err);
     }
 
     // Evaluar la expresión para obtener el valor y el tipo
@@ -442,15 +500,18 @@ visitDeclaracionVariable(node) {
             for(let i = 0; i < pos.length; i++){
                 const expresion = pos[i];
                 if(!Array.isArray(pivote)){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo de más de una dimensión`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no es un arreglo de arreglos`);
+                    errores.push(err);
                 }
 
                 if(expresion.tipo != "int"){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero`);
+                    errores.push(err);
                 }
 
                 if(expresion.valor > pivote.length){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo está fuera de rango`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo está fuera de rango`);
+                    errores.push(err);
                 }
 
                 pivote = pivote[expresion.valor];
@@ -472,7 +533,8 @@ visitDeclaracionVariable(node) {
         const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
+            errores.push(err);
         }
 
         this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
@@ -488,7 +550,8 @@ visitDeclaracionVariable(node) {
         const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
         if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede decrementar una variable que no es de tipo int o float`);
+            errores.push(err);
         }
 
         this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
@@ -536,7 +599,8 @@ visitAsignacion(node) {
             const expresion = pos[0];
 
             if(expresion.tipo != "int" || expresion.valor <0){
-                throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+                errores.push(err);
             }
 
             this.entornoActual.updateVariableArreglo(node.id,valor,expresion,node.location.start.line,node.location.start.column);
@@ -547,7 +611,8 @@ visitAsignacion(node) {
         if(pos.length > 1){
             pos.forEach(p => {
                 if(p.tipo != "int" || p.valor <0){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`La posición del arreglo no es un entero positivo y un entero`);
+                    errores.push(err);
                 }
             });
 
@@ -696,7 +761,8 @@ visitAsignacion(node) {
         const igualTipo = vals.every(v => v.tipo === tipo1);
 
         if(!igualTipo) {
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Los elementos del arreglo no son del mismo tipo`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`Los valores del arreglo no son del mismo tipo`);
+            errores.push(err);
         }
 
         const arregloGuardado  = vals.map(v => v.valor);
@@ -719,13 +785,15 @@ visitAsignacion(node) {
             vals.valor.forEach(v => {
 
                 if(Array.isArray(v.valor)){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un valor`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un valor primitivo`);
+                    errores.push(err);
                 }
 
                 if(tipo == "float" && vals.tipo == "int") {
                     pivote.push(parseFloat(v));
                 }else if (tipo != vals.tipo){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                    errores.push(err);
                 }else{
                     pivote.push(v);
                 }
@@ -742,13 +810,15 @@ visitAsignacion(node) {
             vals.valor.forEach( v=>{
 
                 if(!Array.isArray(v)){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un arreglo`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un arreglo`);
+                    errores.push(err);
                 }
 
                 if(tipo == "float" && vals.tipo == "int"){
                     pivote.push(v);
                 }else if(tipo != vals.tipo) {
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                    errores.push(err);
                 }else{
                     pivote.push(v);
                 }
@@ -756,7 +826,8 @@ visitAsignacion(node) {
             })
 
             if(!this.comprobarDimensiones(pivote,dimens)){
-                throw new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no son correctas`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
+                errores.push(err);
             }
 
             this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
@@ -796,11 +867,13 @@ visitAsignacion(node) {
         const tamanos = node.tamanos.map(t => t.accept(this));
 
         if(tipo1 != tipo2){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de los arreglos no coincide`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de los arreglos no coincide`);
+            errores.push(err);
         }
 
         if(dimens != tamanos.length){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
+            errores.push(err);
         }
 
         if(dimens <= 1 && tamanos.length <=1){
@@ -835,7 +908,8 @@ visitAsignacion(node) {
 
             tamanos.forEach(t =>{
                 if(t.tipo != "int" || t.valor <0){
-                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
+                    errores.push(err);
                 }
             })
 
@@ -877,18 +951,21 @@ visitAsignacion(node) {
         const copiaArreglo = node.exp.accept(this);
 
         if(!Array.isArray(copiaArreglo.valor)){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
+            errores.push(err);
         }
 
         if(Array.isArray(copiaArreglo.valor[0])){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo de una dimensión`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo de arreglos`);
+            errores.push(err);
         }
 
         if(tipo == "float" && copiaArreglo.tipo == "int"){
             const copiar = [...copiaArreglo.valor];
             this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
         }else if(tipo != copiaArreglo.tipo){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+            errores.push(err);
         }else{
             const copiar = [...copiaArreglo.valor];
             this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
@@ -936,7 +1013,8 @@ visitAsignacion(node) {
         const unico = new Set(noParams);
 
         if(noParams.length != unico.size){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`Hay parámetros repetidos en la función`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`Los parámetros de la función no son únicos`);
+            errores.push(err);
         }
 
         const funcion = new Foreign(node, this.entornoActual);
@@ -954,17 +1032,20 @@ visitAsignacion(node) {
         const args = node.args.map(arg => arg.accept(this));
 
         if(!(funcion instanceof Invocar)){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`La variable no es una función`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El identificador no es una función`);
+            errores.push(err);
         }
         
         if(funcion.aridad().length !== args.length){
-            throw new SemanticError(node.location.start.line,node.location.start.column,`La cantidad de argumentos no coincide con la cantidad de parámetros`);
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`El número de argumentos no coincide con el número de parámetros`);
+            errores.push(err);
         }
 
         args.forEach((arg, indice) => {
             const tipo = funcion.aridad()[indice]
             if(tipo.tipo != arg.tipo){
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tipo de argumento no coincide con el tipo del parámetro`);
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de argumento no coincide con el tipo de parámetro`);
+                errores.push(err);
             }
         })
 
