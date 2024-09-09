@@ -40,23 +40,42 @@ export class InterpreterVisitor extends BaseVisitor{
         const izq = node.izq.accept(this);
         const der = node.der.accept(this);
 
-        if(izq.valor == null || der.valor == null){
+        /*if(izq.valor == null || der.valor == null){
             let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
             errores.push(err);
             
-        }
+        }*/
 
         switch(node.op) {
             case '+':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor + der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            console.log("aqui estoooy")
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "int" };
+                        }
                     case "int-float":
                     case "float-int":
                     case "float-float":
-                        return { valor: izq.valor + der.valor, tipo: "float" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "float" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "float" };
+                        }
                     case "string-string":
-                        return { valor: izq.valor + der.valor, tipo: "string" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "string" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "string" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -65,11 +84,23 @@ export class InterpreterVisitor extends BaseVisitor{
             case '-':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor - der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor - der.valor, tipo: "int" };
+                        }
                     case "int-float":
                     case "float-int":
                     case "float-float":
-                        return { valor: izq.valor - der.valor, tipo: "float" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "float" };
+                        }else{
+                            return { valor: izq.valor - der.valor, tipo: "float" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -77,11 +108,23 @@ export class InterpreterVisitor extends BaseVisitor{
             case '*': 
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor * der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor * der.valor, tipo: "int" };
+                        }
                     case "int-float":
                     case "float-int":
                     case "float-float":
-                        return { valor: izq.valor * der.valor, tipo: "float" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "float" };
+                        }else{
+                            return { valor: izq.valor * der.valor, tipo: "float" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -96,15 +139,25 @@ export class InterpreterVisitor extends BaseVisitor{
                     switch (`${izq.tipo}-${der.tipo}`) {
                         case "int-int":
                             // Realiza la división y redondea el resultado a un entero
-                            const divisionInt = Math.floor(izq.valor / der.valor);
-                            return { valor: divisionInt, tipo: "int" };
+                            if(izq.valor == null || der.valor == null){
+                                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                                errores.push(err);
+                                return { valor: null, tipo: "int" };
+                            }else{
+                                const divisionInt = Math.floor(izq.valor / der.valor);
+                                return { valor: divisionInt, tipo: "int" };
+                            }
                         
                         case "int-float":
                         case "float-int":
                         case "float-float":
-                            // Realiza la división y el resultado es un float
-                            return { valor: izq.valor / der.valor, tipo: "float" };
-                        
+                            if(izq.valor == null || der.valor == null){
+                                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                                errores.push(err);
+                                return { valor: null, tipo: "float" };
+                            }else{
+                                return { valor: izq.valor / der.valor, tipo: "float" };
+                            }                        
                         default:
                             let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                             errores.push(err);
@@ -116,7 +169,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-int":
                     case "float-float":
                     case "char-char":
-                        return { valor: izq.valor < der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor < der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -128,7 +187,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-int":
                     case "float-float":
                     case "char-char":
-                        return { valor: izq.valor > der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor > der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -140,7 +205,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-int":
                     case "float-float":
                     case "char-char":
-                        return { valor: izq.valor <= der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor <= der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -152,7 +223,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "float-int":
                     case "float-float":
                     case "char-char":
-                        return { valor: izq.valor >= der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor >= der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -160,7 +237,13 @@ export class InterpreterVisitor extends BaseVisitor{
             case '%': 
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor % der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor % der.valor, tipo: "int" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -174,7 +257,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "boolean-boolean":
                     case "string-string":
                     case "char-char":
-                        return { valor: izq.valor == der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor == der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -188,7 +277,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     case "boolean-boolean":
                     case "string-string":
                     case "char-char":
-                        return { valor: izq.valor != der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor != der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -196,7 +291,13 @@ export class InterpreterVisitor extends BaseVisitor{
             case '&&':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
-                        return { valor: izq.valor && der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor && der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -204,7 +305,13 @@ export class InterpreterVisitor extends BaseVisitor{
             case '||':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "boolean-boolean":
-                        return { valor: izq.valor || der.valor, tipo: "boolean" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "boolean" };
+                        }else{
+                            return { valor: izq.valor || der.valor, tipo: "boolean" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -212,12 +319,30 @@ export class InterpreterVisitor extends BaseVisitor{
             case '+=':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor + der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "int" };
+                        }
                     case "float-int":
                     case "float-float":
-                        return { valor: izq.valor + der.valor, tipo: "float" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "float" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "float" };
+                        }
                     case "string-string":
-                        return { valor: izq.valor + der.valor, tipo: "string" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "string" };
+                        }else{
+                            return { valor: izq.valor + der.valor, tipo: "string" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -225,10 +350,22 @@ export class InterpreterVisitor extends BaseVisitor{
             case '-=':
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
-                        return { valor: izq.valor - der.valor, tipo: "int" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }else{
+                            return { valor: izq.valor - der.valor, tipo: "int" };
+                        }
                     case "float-int":
                     case "float-float":
-                        return { valor: izq.valor - der.valor, tipo: "float" };
+                        if(izq.valor == null || der.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return { valor: null, tipo: "float" };
+                        }else{
+                            return { valor: izq.valor - der.valor, tipo: "float" };
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -254,9 +391,21 @@ export class InterpreterVisitor extends BaseVisitor{
             case '-': 
                 switch(exp.tipo){
                     case "int":
-                        return {valor: -exp.valor, tipo: exp.tipo}
+                        if(exp.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return {valor: null, tipo: exp.tipo}
+                        }else{
+                            return {valor: -exp.valor, tipo: exp.tipo}
+                        }
                     case "float":
-                        return {valor: -exp.valor, tipo: exp.tipo}
+                        if(exp.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return {valor: null, tipo: exp.tipo}
+                        }else{
+                            return {valor: -exp.valor, tipo: exp.tipo}
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
@@ -264,16 +413,34 @@ export class InterpreterVisitor extends BaseVisitor{
             case '!':
                 switch(exp.tipo){
                     case "boolean":
-                        return {valor: !exp.valor, tipo: exp.tipo}
+                        if(exp.valor == null){
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                            errores.push(err);
+                            return {valor: null , tipo: exp.tipo}
+                        }else{
+                            return {valor: !exp.valor, tipo: exp.tipo}
+                        }
                     default:
                         let err = new SemanticError(node.location.start.line,node.location.start.column,`No es valida esa operacion`);
                         errores.push(err);
                 }
             case 'typeof':
                 //console.log("el tipo es:",exp.tipo)
-                return {valor:exp.tipo ,tipo:'string'};
+                if(exp.valor == null){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                    errores.push(err);
+                    return {valor: null , tipo: 'string'}
+                }else{
+                    return {valor:exp.tipo ,tipo:'string'};
+                }
             case 'toString':
-                return {valor:exp.valor.toString(),tipo:'string'};
+                if(exp.valor == null){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                    errores.push(err);
+                    return {valor: null , tipo: 'string'}
+                }else{
+                    return {valor:exp.valor.toString(),tipo:'string'};
+                }
             case 'toUpperCase':
 
                 if(exp.tipo != "string"){
@@ -281,8 +448,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     errores.push(err);
                 }
 
-                return {valor:exp.valor.toUpperCase(),tipo:'string'};
-
+                if(exp.valor == null){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                    errores.push(err);
+                    return {valor: null , tipo: 'string'}
+                }else{
+                    return {valor:exp.valor.toUpperCase(),tipo:'string'};
+                }
             case 'toLowerCase':
 
                 if(exp.tipo != "string"){
@@ -290,7 +462,13 @@ export class InterpreterVisitor extends BaseVisitor{
                     errores.push(err);
                 }
 
-                return {valor:exp.valor.toLowerCase(),tipo:'string'};
+                if(exp.valor == null){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
+                    errores.push(err);
+                    return {valor: null , tipo: 'string'}
+                }else{
+                    return {valor:exp.valor.toLowerCase(),tipo:'string'};
+                }
             
             case 'parseInt':
                 // Verificar si exp.tipo es "string"
@@ -300,6 +478,7 @@ export class InterpreterVisitor extends BaseVisitor{
             
                     // Verificar si el valor convertido es un número y no tiene letras
                     if (!isNaN(num) && /^-?\d+(\.\d+)?$/.test(exp.valor)) {
+                        
                         // Convertir a int redondeando hacia abajo
                         return { valor: Math.floor(num), tipo: 'int' };
                     }
@@ -538,13 +717,19 @@ visitDeclaracionVariable(node) {
         const nombreVariable = node.id;
         const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
-        if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
+        if(valorVariable.valor == null){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no tiene valor`);
             errores.push(err);
+        }else{
+            if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede incrementar una variable que no es de tipo int o float`);
+                errores.push(err);
+            }
+    
+            this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
+            return {valor:valorVariable.valor + 1 , tipo: valorVariable.tipo};
         }
-
-        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor + 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
-        return {valor:valorVariable.valor + 1 , tipo: valorVariable.tipo};
+        
     }
 
     /**
@@ -555,13 +740,18 @@ visitDeclaracionVariable(node) {
         const nombreVariable = node.id;
         const valorVariable = this.entornoActual.getVariable(nombreVariable,node.location.start.line,node.location.start.column);
         //console.log("el tipo de variable es:",valorVariable.tipo)
-        if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede decrementar una variable que no es de tipo int o float`);
+        if(valorVariable.valor == null){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede decrementar una variable que no tiene valor`);
             errores.push(err);
+        }else{
+            if(valorVariable.tipo != "int" && valorVariable.tipo != "float"){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede decrementar una variable que no es de tipo int o float`);
+                errores.push(err);
+            }
+    
+            this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
+            return {valor:valorVariable.valor - 1 , tipo: valorVariable.tipo};
         }
-
-        this.entornoActual.updateVariable(nombreVariable,{valor: valorVariable.valor - 1, tipo: valorVariable.tipo},node.location.start.line,node.location.start.column);
-        return {valor:valorVariable.valor - 1 , tipo: valorVariable.tipo};
     }
 
     /**
