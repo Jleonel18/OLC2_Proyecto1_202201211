@@ -40,6 +40,11 @@
 }
 
 programa = _ dcl:Declaracion* _ { return dcl }
+          /// struct:Struct* _ { return struct }
+
+//Struct = "struct" _ id:Identificador _ "{" _ params:ParamsStruct* _ "}" { return crearNodo('struct', { id, decl }) }
+
+//ParamsStruct = tipo:TipoDato _ id:Identificador _ ";" { return crearNodo('tipoVariable', { tipo, id }) }*/
 
 Declaracion = dcl:VarDcl _ { return dcl }
             / stmt:Stmt _ { return stmt }
@@ -78,8 +83,8 @@ ForInic = dc:VarDcl { return dc }
         / exp:Expresion _ ";" { return exp }
         / ";" { return null }
 
-Cases = "case" _ exp:Expresion _ ":" _ stmt:( _ stmt:Stmt _ {return stmt})* _ { return { exp, stmt } }
-Defaul = "default" _ ":" _ stmt:(_ stmt: Stmt _ {return stmt})*_ { return stmt  }
+Cases = "case" _ exp:Expresion _ ":" _ stmt:( _ stmt:Declaracion _ {return stmt})* _ { return { exp, stmt } }
+Defaul = "default" _ ":" _ stmt:(_ stmt: Declaracion _ {return stmt})*_ { return stmt  }
 
 Arreglo = tipo:TipoDato _ "[" _ "]" _ id:Identificador _ "=" _ id2: Identificador _ pos:(_ "[" _ v:Expresion _ "]" {return v})* _ ";" {return crearNodo('copiarArreglo', {tipo,id, exp:crearNodo('referenciaVariable', {id:id2, pos })})}
           / tipo:TipoDato _ tmn:( "[" _  vl1:"]" _ vl2:(_ "[" _ v:"]" {return v})* {return [vl1, ...vl2]}) _ id:Identificador _ "=" _ valores:Expresion _ ";" {return crearNodo('arregloVal', {tipo, id, tmn, valores})}
