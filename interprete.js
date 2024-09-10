@@ -5,6 +5,8 @@ import { BreakException, ContinueException, SemanticError, ReturnException } fro
 import { Foreign } from "./foreign.js";
 import { Invocar } from "./invocar.js";
 import { errores } from "./index.js";
+import { Struct } from "./struct.js";
+import { Instancia } from "./instancia.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
@@ -775,12 +777,130 @@ visitDeclaracionVariable(node) {
         node.exp.accept(this);
     }
 
+    /**
+     * @type {BaseVisitor['visitStruct']}
+     */
+    visitStruct(node) {            
+            const propiedades = {};
+
+            node.decl.forEach(d => {
+
+                propiedades[d.id] = {
+                    tipo: d.tipo,
+                    valor: null
+                    
+                };
+            });
+
+            const nuevoStruct = new Struct(node.id, propiedades);
+
+            this.entornoActual.setVariable(node.id,node.id, nuevoStruct,node.location.start.line,node.location.start.column);
+    }
+
+    /**
+     * @type {BaseVisitor['visitInstanciaStruct']}
+     */
+    visitInstanciaStruct(node){
+        const tipo = node.tipo;
+            const id = node.id;
+            const instancia = node.instancia.accept(this);
+            
+            const struct = this.entornoActual.getVariable(tipo,node.location.start.line,node.location.start.column).valor;
+
+
+            if(tipo != instancia.tipo) {
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de la instancia no coincide con el tipo de la estructura`);
+                errores.push(err);
+            }
+
+            if(!(struct instanceof Struct)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${tipo} no es una estructura`);
+                errores.push(err);
+            }
+            
+            this.entornoActual.setVariable(tipo, id, instancia.valor,node.location.start.line,node.location.start.column);
+
+            return struct.invocar(this, instancia.valor.struct.properties);
+    }
+
+    /**
+     * @type {BaseVisitor['visitRecStruct']}
+     */
+    visitRecStruct(node){
+        const tipo = node.tipo;
+            const atributos = node.atrib 
+
+            let temp = {};
+
+            const struct = this.entornoActual.getVariable(tipo,node.location.start.line,node.location.start.column);
+
+            if(!(struct.valor instanceof Struct)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${tipo} no es una estructura`);
+                errores.push(err);
+            }
+
+            atributos.forEach(atributo => {
+                const id = atributo.id;
+                if(!(id in struct.valor.properties)){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El atributo ${id} no existe en la estructura`);
+                    errores.push(err);
+                }
+
+                const pivote = atributo.exp.accept(this);
+
+                if(struct.valor.properties[id].tipo != pivote.tipo){
+                    if(!(struct.valor.properties[id].tipo == "float" && pivote.tipo == "int")){
+                        
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del atributo ${id} no coincide con el tipo de la estructura`);
+                        errores.push(err);
+                    }
+                }
+                    temp[id] = {valor:pivote.valor , tipo:pivote.tipo};
+
+                    
+            });
+
+            return {valor:new Instancia(new Struct(tipo, temp)), tipo:tipo};
+    }
+
+    /**
+     * @type {BaseVisitor['visitGet']}
+     */
+    visitGet(node){
+        const instan = node.objetivo.accept(this);
+
+            if(!(instan.valor instanceof Instancia)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${instan.valor} no es una instancia`);
+                errores.push(err);
+            }
+
+            return instan.valor.get(node.propiedad,node);
+    }
+
+    /**
+     * @type {BaseVisitor['visitSet']}
+     */
+    visitSet(node){
+        const instan = node.objetivo.accept(this);
+
+            if(!(instan.valor instanceof Instancia)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${instan.valor} no es una instancia`);
+                errores.push(err);
+            }
+
+            const valor = node.valor.accept(this);
+
+            instan.valor.set(node.propiedad, valor,node);
+
+            return valor;
+    }
+
 /**
 * @type {BaseVisitor['visitAsignacion']}
 */
 visitAsignacion(node) {
 
-    const valorA = node.exp.accept(this);
+    const valorA = node.asgn.accept(this);
 
     this.entornoActual.updateVariable(node.id,valorA,node.location.start.line,node.location.start.column);
     return valorA;

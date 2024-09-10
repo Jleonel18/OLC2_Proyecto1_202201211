@@ -30,7 +30,13 @@
       'asignacionArreglo': nodos.AsignacionArreglo,
       'declFuncion': nodos.DeclFuncion,
       'llamada': nodos.Llamada,
-      'arregloFunc': nodos.ArregloFunc
+      'arregloFunc': nodos.ArregloFunc,
+      'struct': nodos.Struct,
+      'instanciaStruct': nodos.InstanciaStruct,
+      'recStruct': nodos.RecStruct,
+      'instanciaStruct': nodos.InstanciaStruct,
+      'get': nodos.Get,
+      'set': nodos.Set
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -41,20 +47,9 @@
 
 programa = _ dcl:Declaracion* _ { return dcl }
 
-/*Struct = "struct" _ id:Identificador _ "{" _ params:ParamsStruct* _ "}" _ ";" {
-  const structDef = {
-        id: id,
-        params: params.map(p => ({ tipo: p.tipo, id: p.id }))
-  };
-
-  Entorno.setStruct(id, structDef);
-    
-  return structDef;
-}
-
-ParamsStruct = tipo:TipoDato _ id:Identificador _ ";" { return crearNodo('tipoVariable', { tipo, id }) }*/
-
-Declaracion = dcl:VarDcl _ { return dcl }
+Declaracion = decl: DeclStruct _ { return decl }
+            /  dcl:VarDcl _ { return dcl }
+            / dcl:DeclInstancia _ { return dcl }
             / stmt:Stmt _ { return stmt }
             / dcl:FuncDcl _ { return dcl }
             / arreglo:Arreglo _ { return arreglo }
@@ -62,6 +57,16 @@ Declaracion = dcl:VarDcl _ { return dcl }
 VarDcl = tipo:TipoDato _ id:Identificador _ exp:("=" _ exp:Expresion _ {return exp})?";" { return crearNodo('tipoVariable', { tipo, id, exp }) }
         / "var" _ id:Identificador _ "=" _ exp:Expresion ";" { return crearNodo('declaracionVariable', { id, exp }) }
 TipoDato = "int" / "float" / "string" / "boolean" / "char"
+
+DeclStruct  = "struct" _ id:Identificador _ "{" _ decl:BloqueStruct* _ "}" _ ";" { return crearNodo('struct', { id, decl }) }
+
+BloqueStruct = tipo: (TipoDato/Identificador) _ id: Identificador _ ";" _ { return { tipo, id } }
+
+DeclInstancia = tipo:Identificador _ id:Identificador _ "=" _ instancia:Expresion _ ";" { return crearNodo('instanciaStruct', { tipo, id, instancia }) }
+
+RecStruct = _ tipo: Identificador _ "{"_ atrib:( datAtri: DatoStruc _ datAtris:("," _ atriData: DatoStruc { return atriData })* _ { return [datAtri, ...datAtris] }) _ "}" { return crearNodo('recStruct', { tipo, atrib }) }
+
+DatoStruc = id: Identificador _ ":" _ exp: Expresion _ { return { id, exp } }
 
 FuncDcl = tipo:(TipoDato/"void") _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque: Bloque {return crearNodo('declFuncion', {tipo, id, params: params || [] , bloque})}
 
@@ -103,7 +108,22 @@ Identificador = [a-zA-Z_][a-zA-Z0-9_]* { return text() }
 Expresion = Asignacion
 
 Asignacion = id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) _ "=" _ asg:Expresion {return crearNodo('asignacionArreglo',{id, pos, asg})}
-            / id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
+            // id:Identificador _ "=" _ exp:Asignacion _ { return crearNodo('asignacion', { id, exp }) }
+            /asignado:Llamada _ "=" _ asgn:Asignacion 
+              { 
+
+                if (asignado instanceof nodos.ReferenciaVariable) {
+                  return crearNodo('asignacion', { id: asignado.id, asgn })
+                }
+
+                if (!(asignado instanceof nodos.Get || asignado instanceof nodos.nodos.ArregloVal || asignado instanceof nodos.nodos.ArregloFunc || asignado instanceof nodos.nodos.Arreglo || asignado instanceof nodos.ArregloVacio || asignado instanceof nodos.CopiarArreglo || asignado instanceof nodos.Asignacion)) {
+                  throw new Error('Solo se pueden asignar valores a propiedades de objetos')
+                }
+                
+                return crearNodo('set', { objetivo: asignado.objetivo, propiedad: asignado.propiedad, valor: asgn })
+
+
+              }
             / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id, pos:[]}),der:exp}) })}
             / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id,pos:[]}),der:exp}) })}
             / Ternario
@@ -191,15 +211,34 @@ Unaria =   id: Identificador "." op:FuncArreglo _ {return crearNodo('arregloFunc
 
 FuncArreglo = "length" / "join()"
 
-Llamada = callee:Primitivos _ params:( "(" _ args:Argumentos? _ ")" {return args})* {
+/*Llamada = callee:Primitivos _ params:( "(" _ args:Argumentos? _ ")" {return args})* {
   return params.reduce(
     (callee, args) => {
       return crearNodo('llamada', { callee, args: args || [] })
     },
     callee
   )
-}
+}*/
+Llamada = objetivoInicial:Primitivos operaciones:(
+    ("(" _ args:Argumentos? _ ")" { return {args, tipo: 'llamada' } })
+    / ("." _ id:Identificador _ { return { id, tipo: 'get' } })
+  )* 
+  {
+  const op =  operaciones.reduce(
+    (objetivo, args) => {
+      const { tipo, id, args:argumentos } = args
 
+      if (tipo === 'llamada') {
+        return crearNodo('llamada', { callee: objetivo, args: argumentos || [] })
+      }else if (tipo === 'get') {
+        return crearNodo('get', { objetivo, propiedad: id })
+      }
+    },
+    objetivoInicial
+  )
+
+return op
+}
 Argumentos = arg:Expresion _ args:("," _ exp:Expresion _ {return exp})* { return [arg, ...args] }
 
 Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('primitivo', { valor: parseFloat(text(), 10), tipo:"float"}) : crearNodo('primitivo', { valor: parseInt(text(), 10), tipo:"int"})	 }
@@ -208,6 +247,7 @@ Primitivos = [0-9]+( "." [0-9]+ )? { return text().includes('.') ? crearNodo('pr
     / Cadena
     / "(" exp:Expresion ")" { return crearNodo('agrupacion', { exp })}
     / "{" _ exp1:Expresion _ vls:("," _ exp:Expresion _ {return exp})* _ "}" { return crearNodo('arreglo',{vls: [exp1, ...vls]} ) }
+    / rec: RecStruct { return rec } 
     / id: Identificador { return crearNodo('referenciaVariable', { id, pos:[] }) }
 
 Cadena = "\"" contenido:[^"]* "\""{ var text = contenido.join(""); 

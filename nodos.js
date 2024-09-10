@@ -392,9 +392,9 @@ export class Asignacion extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.id Identificador variable a asignar
- * @param {Expresion} options.exp Expresion a asignar
+ * @param {Expresion} options.asgn Expresion a asignar
     */
-    constructor({ id, exp }) {
+    constructor({ id, asgn }) {
         super();
         
         /**
@@ -408,7 +408,7 @@ export class Asignacion extends Expresion {
          * Expresion a asignar
          * @type {Expresion}
         */
-        this.exp = exp;
+        this.asgn = asgn;
 
     }
 
@@ -1058,4 +1058,185 @@ export class ArregloFunc extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada, ArregloFunc }
+export class Struct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador del struct
+ * @param {Expresion} options.decl Declaraciones del struct
+    */
+    constructor({ id, decl }) {
+        super();
+        
+        /**
+         * Identificador del struct
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Declaraciones del struct
+         * @type {Expresion}
+        */
+        this.decl = decl;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitStruct(this);
+    }
+}
+    
+export class RecStruct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Identificador del struct
+ * @param {Expresion[]} options.atrib Atributos del struct
+    */
+    constructor({ tipo, atrib }) {
+        super();
+        
+        /**
+         * Identificador del struct
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Atributos del struct
+         * @type {Expresion[]}
+        */
+        this.atrib = atrib;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitRecStruct(this);
+    }
+}
+    
+export class InstanciaStruct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Identificador del struct
+ * @param {string} options.id Identificador de la estructura
+ * @param {Expresion} options.instancia Instancia del struct
+    */
+    constructor({ tipo, id, instancia }) {
+        super();
+        
+        /**
+         * Identificador del struct
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la estructura
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Instancia del struct
+         * @type {Expresion}
+        */
+        this.instancia = instancia;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitInstanciaStruct(this);
+    }
+}
+    
+export class Get extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.objetivo Objeto a obtener
+ * @param {string} options.propiedad Propiedad a obtener
+    */
+    constructor({ objetivo, propiedad }) {
+        super();
+        
+        /**
+         * Objeto a obtener
+         * @type {Expresion}
+        */
+        this.objetivo = objetivo;
+
+
+        /**
+         * Propiedad a obtener
+         * @type {string}
+        */
+        this.propiedad = propiedad;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitGet(this);
+    }
+}
+    
+export class Set extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.objetivo Objetivo de la operacion
+ * @param {string} options.propiedad Identificador de la propiedad
+ * @param {Expresion} options.valor Valor a asignar
+    */
+    constructor({ objetivo, propiedad, valor }) {
+        super();
+        
+        /**
+         * Objetivo de la operacion
+         * @type {Expresion}
+        */
+        this.objetivo = objetivo;
+
+
+        /**
+         * Identificador de la propiedad
+         * @type {string}
+        */
+        this.propiedad = propiedad;
+
+
+        /**
+         * Valor a asignar
+         * @type {Expresion}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitSet(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada, ArregloFunc, Struct, RecStruct, InstanciaStruct, Get, Set }
