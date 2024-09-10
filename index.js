@@ -2,6 +2,8 @@ import { parse } from './analizador.js';
 import { Entorno } from './entorno.js';
 import { InterpreterVisitor } from './interprete.js';
 import { SemanticError } from './transfer.js';
+import { Struct } from './struct.js';
+import { Instancia } from './instancia.js';
 
 const editor = document.getElementById('codeInput');
 const btn = document.getElementById('compileButton');
@@ -142,9 +144,25 @@ function actualizarTablaSimbolos() {
             celdaNombre.textContent = error.nombre;
             fila.appendChild(celdaNombre);
 
-            if (String(error.valor) === "[object Object]") {
+            /*if (String(error.valor) === "[object Object]") {
                 error.valor = "funcion";
+            }*/
+            if(error.valor instanceof Struct || error.valor instanceof Instancia){
+                error.valor = "struct";
+            }else if(String(error.valor) === "[object Object]"){
+                error.valor = "funcion";
+            }else{
+                if(error.valor == null){
+                    error.valor = "null";
+                }else{
+                    error.valor = error.valor;
+                }
+
             }
+
+            /*if(error.valor == null){
+                error.valor = "null";
+            }*/
             const celdaValor = document.createElement("td");
             celdaValor.textContent = error.valor;
             fila.appendChild(celdaValor);
