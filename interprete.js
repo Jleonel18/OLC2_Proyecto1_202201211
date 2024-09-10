@@ -900,6 +900,9 @@ visitDeclaracionVariable(node) {
 */
 visitAsignacion(node) {
 
+    /*console.log("el node:",node)
+    console.log("el asgn:",node.asgn)*/
+
     const valorA = node.asgn.accept(this);
 
     this.entornoActual.updateVariable(node.id,valorA,node.location.start.line,node.location.start.column);

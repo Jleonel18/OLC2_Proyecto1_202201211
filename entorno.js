@@ -178,7 +178,7 @@ updateVariable(nombre, valor, linea, columna) {
             }
             if(Array.isArray(actual.valor[indice.valor])){
 
-                let err = SemanticError(linea,columna,`Variable ${nombre} no es un arreglo de arreglos`);
+                let err = new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo de arreglos`);
                 errores.push(err);
             }
             if(indice.valor >= actual.valor.length) {

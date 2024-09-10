@@ -116,7 +116,7 @@ Asignacion = id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v
                   return crearNodo('asignacion', { id: asignado.id, asgn })
                 }
 
-                if (!(asignado instanceof nodos.Get || asignado instanceof nodos.nodos.ArregloVal || asignado instanceof nodos.nodos.ArregloFunc || asignado instanceof nodos.nodos.Arreglo || asignado instanceof nodos.ArregloVacio || asignado instanceof nodos.CopiarArreglo || asignado instanceof nodos.Asignacion)) {
+                if (!(asignado instanceof nodos.Get || asignado instanceof nodos.nodos.ArregloVal || asignado instanceof nodos.nodos.ArregloFunc || asignado instanceof nodos.nodos.Arreglo || asignado instanceof nodos.ArregloVacio || asignado instanceof nodos.CopiarArreglo)) {
                   throw new Error('Solo se pueden asignar valores a propiedades de objetos')
                 }
                 
@@ -124,8 +124,8 @@ Asignacion = id:Identificador _ pos:("[" _ val:Expresion _ "]"_ val2:( _ "[" _ v
 
 
               }
-            / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id, pos:[]}),der:exp}) })}
-            / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, exp: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id,pos:[]}),der:exp}) })}
+            / id:Identificador _ "+=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, asgn: crearNodo('binaria', {op:"+=",izq: crearNodo('referenciaVariable',{id, pos:[]}),der:exp}) })}
+            / id:Identificador _ "-=" _ exp: Expresion _ {return crearNodo('asignacion' ,{id, asgn: crearNodo('binaria', {op:"-=",izq: crearNodo('referenciaVariable',{id,pos:[]}),der:exp}) })}
             / Ternario
             / Logico
 
@@ -191,10 +191,10 @@ Multiplicacion = izq:Unaria expansion:(
     )
 }
 
-Unaria =   id: Identificador "." op:FuncArreglo _ {return crearNodo('arregloFunc',{
-            id:crearNodo('referenciaVariable', {id:id, pos:[]}),op, params: undefined})}
-          /id: Identificador "." op:"indexOf" "(" _ params:Expresion _ ")" _ {return crearNodo('arregloFunc',{
-            id:crearNodo('referenciaVariable',{id:id, pos:[]}),op,params})} 
+Unaria =   id: Identificador val2:( _ "[" _ v:Expresion _ "]" {return v})* "." op:FuncArreglo _ {return crearNodo('arregloFunc',{
+            id:crearNodo('referenciaVariable', {id:id, pos:val2}),op, params: undefined})}
+          /id: Identificador val2:( _ "[" _ v:Expresion _ "]" {return v})* "." op:"indexOf" "(" _ params:Expresion _ ")" _ {return crearNodo('arregloFunc',{
+            id:crearNodo('referenciaVariable',{id:id, pos:val2}),op,params})} 
           /"toString(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toString', exp }) }
           / "toUpperCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toUpperCase', exp }) }
           / "toLowerCase(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'toLowerCase', exp }) }
