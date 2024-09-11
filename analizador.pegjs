@@ -36,7 +36,8 @@
       'recStruct': nodos.RecStruct,
       'instanciaStruct': nodos.InstanciaStruct,
       'get': nodos.Get,
-      'set': nodos.Set
+      'set': nodos.Set,
+      'foreach': nodos.Foreach
     };
 
     const nodo = new tipos[tipoNodo](props);
@@ -84,6 +85,7 @@ Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {retu
     / "for" _ "(" _ inic: ForInic _ cond: Expresion _ ";" _ incremento: Expresion _ ")" _ stmt:Stmt {
       return crearNodo('for', { inic, cond, incremento, stmt })
     }
+    / Foreach
     / "switch" _ "(" _ exp:Expresion _ ")" _ "{" _ cases:Cases* _ defa:Defaul? _ "}" { return crearNodo('switch', { exp, cases, defa }) }
     / "break" _ ";" { return crearNodo('break') }
     / "continue" _ ";" { return crearNodo('continue') }
@@ -91,6 +93,8 @@ Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {retu
     / exp:Expresion _ ";" { return crearNodo('expresionStmt', { exp }) }
 
 Bloque = "{" _ decl:Declaracion*  "}" { return crearNodo('bloque', { decl }) }
+
+Foreach = "for" _ "(" _ tipo: TipoDato _ id: Identificador _ ":" _ id2: Identificador _ ")" _ stmt: Stmt {return crearNodo('foreach', {tipo, id, id2, stmt})}
 
 ForInic = dc:VarDcl { return dc }
         / exp:Expresion _ ";" { return exp }

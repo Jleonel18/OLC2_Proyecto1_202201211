@@ -1239,4 +1239,53 @@ export class Set extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada, ArregloFunc, Struct, RecStruct, InstanciaStruct, Get, Set }
+export class Foreach extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la lista
+ * @param {string} options.id Identificador de la lista
+ * @param {string} options.id2 Identificador de la variable
+ * @param {Expresion} options.stmt Sentencia del foreach
+    */
+    constructor({ tipo, id, id2, stmt }) {
+        super();
+        
+        /**
+         * Tipo de la lista
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la lista
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Identificador de la variable
+         * @type {string}
+        */
+        this.id2 = id2;
+
+
+        /**
+         * Sentencia del foreach
+         * @type {Expresion}
+        */
+        this.stmt = stmt;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitForeach(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Primitivo, DeclaracionVariable, Ternario, TipoVariable, ReferenciaVariable, Print, ExpresionStmt, Asignacion, AsignacionArreglo, Bloque, If, While, For, Switch, Arreglo, ArregloVal, ArregloVacio, CopiarArreglo, Break, Continue, Return, Incremento, Decremento, DeclFuncion, Llamada, ArregloFunc, Struct, RecStruct, InstanciaStruct, Get, Set, Foreach }

@@ -105,6 +105,9 @@
 
  * @typedef {import('./nodos').Set} Set
 
+
+ * @typedef {import('./nodos').Foreach} Foreach
+
  */
 
 
@@ -427,6 +430,15 @@ export class BaseVisitor {
      */
     visitSet(node) {
         throw new Error('Metodo visitSet no implementado');
+    }
+    
+
+    /**
+     * @param {Foreach} node
+     * @returns {any}
+     */
+    visitForeach(node) {
+        throw new Error('Metodo visitForeach no implementado');
     }
     
 }

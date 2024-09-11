@@ -133,6 +133,23 @@ updateVariable(nombre, valor, linea, columna) {
     errores.push(err);
 }
 
+/**
+ * @param {string} nombre
+*/
+eliminarTemporal(nombre,linea,columna) {
+    if (this.valores[nombre] !== undefined) {
+        delete this.valores[nombre];
+
+    } else if (this.padre) {
+
+        this.padre.eliminarTemporal(nombre,linea,columna);
+    } else {
+        let err = new SemanticError(linea,columna,`Variable ${nombre} no definida`);
+        errores.push(err);
+
+    }
+}
+
 /*updateVariable(nombre, valor,linea,columna) {
     const valorAct = this.valores[nombre];
 
@@ -180,9 +197,6 @@ updateVariable(nombre, valor, linea, columna) {
         const actual = this.valores[nombre];
 
         if(actual != undefined){
-            /*if('temp' in actual.valor){
-                throw new SemanticError('Indefinida','Indefinida',`Variable ${nombre} es temporal`)
-            }*/
 
             if(!Array.isArray(actual.valor)){
                 let err = new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo`);
@@ -223,7 +237,6 @@ updateVariable(nombre, valor, linea, columna) {
         const act = this.valores[nombre];
         
         if(act!= undefined){
-            //if('temp' in act) throw new SemanticError(linea,columna,`Variable ${nombre} es temporal`);
         if(!Array.isArray(act.valor)) {
             let err = new SemanticError(linea,columna,`Variable ${nombre} no es un arreglo`);
             errores.push(err);

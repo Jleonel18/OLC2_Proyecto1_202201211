@@ -1101,6 +1101,40 @@ visitAsignacion(node) {
     }
 
     /**
+     * @type {BaseVisitor['visitForeach']}
+     */
+    visitForeach(node) {
+        const id = node.id
+        const tipo = node.tipo
+        const id2 = node.id2
+        const temporal = this.entornoActual.getVariable(id2, node.location.start.line, node.location.start.column)
+    
+        const entornoAnterior = this.entornoActual
+        this.entornoActual = new Entorno(entornoAnterior)
+    
+        if (!Array.isArray(temporal.valor)) {
+            let err = new SemanticError(node.location.start.line, node.location.start.column, `El id ${id2} no es un arreglo`)
+            errores.push(err)
+            return
+        }
+    
+        if (tipo !== temporal.tipo) {
+            let err = new SemanticError(node.location.start.line, node.location.start.column, `El tipo de la variable ${id} no coincide con el tipo del arreglo`)
+            errores.push(err)
+            return
+        }
+    
+        temporal.valor.forEach(value => {
+            this.entornoActual.setVariable(temporal.tipo, id, value,node.location.start.line, node.location.start.column);
+    
+            node.stmt.accept(this);
+    
+            this.entornoActual.eliminarTemporal(id, node.location.start.line, node.location.start.column);
+        });
+        this.entornoActual = entornoAnterior
+    }
+
+    /**
      * @type {BaseVisitor['visitBreak']}
      */
     visitBreak(node) {
