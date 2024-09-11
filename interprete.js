@@ -252,6 +252,11 @@ export class InterpreterVisitor extends BaseVisitor{
             case '%': 
                 switch (`${izq.tipo}-${der.tipo}`) {
                     case "int-int":
+                        if(der.valor === 0) {
+                            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
+                            errores.push(err);
+                            return { valor: null, tipo: "int" };
+                        }
                         if(izq.valor == null || der.valor == null){
                             let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
                             errores.push(err);
