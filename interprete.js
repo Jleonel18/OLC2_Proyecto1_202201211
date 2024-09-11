@@ -135,15 +135,15 @@ export class InterpreterVisitor extends BaseVisitor{
                         return { valor: null, tipo: "null" };
                 }
                 case '/':
-                    // Verifica si el divisor es cero antes de realizar la división
-                    if (der.valor === 0) {
-                        let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
-                        errores.push(err);
-                    }
                 
                     switch (`${izq.tipo}-${der.tipo}`) {
                         case "int-int":
                             // Realiza la división y redondea el resultado a un entero
+                            if (der.valor === 0) {
+                                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
+                                errores.push(err);
+                                return { valor: null, tipo: "int" };
+                            }
                             if(izq.valor == null || der.valor == null){
                                 let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
                                 errores.push(err);
@@ -156,6 +156,11 @@ export class InterpreterVisitor extends BaseVisitor{
                         case "int-float":
                         case "float-int":
                         case "float-float":
+                            if (der.valor === 0) {
+                                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede dividir por cero`);
+                                errores.push(err);
+                                return { valor: null, tipo: "float" };
+                            }
                             if(izq.valor == null || der.valor == null){
                                 let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede realizar la operación con un valor nulo`);
                                 errores.push(err);

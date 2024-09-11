@@ -58,6 +58,8 @@ updateVariable(nombre, valor, linea, columna) {
                 this.valores[nombre].tipo = "int";
             } else {
                 // Guardar null si el tipo no coincide
+                let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+                errores.push(err);
                 this.valores[nombre].valor = null;
             }
         } else if (valorAct.tipo === "float") {
@@ -71,6 +73,8 @@ updateVariable(nombre, valor, linea, columna) {
                 this.valores[nombre].tipo = "float"; // Tipo actualizado a float
             } else {
                 // Guardar null si el tipo no coincide
+                let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+                errores.push(err);
                 this.valores[nombre].valor = null;
             }
         } else if (valorAct.tipo === "boolean") {
@@ -80,6 +84,8 @@ updateVariable(nombre, valor, linea, columna) {
                 this.valores[nombre].tipo = "boolean";
             } else {
                 // Guardar null si el tipo no coincide
+                let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+                errores.push(err);
                 this.valores[nombre].valor = null;
             }
             
@@ -90,6 +96,8 @@ updateVariable(nombre, valor, linea, columna) {
                 this.valores[nombre].tipo = "char";
             } else {
                 // Guardar null si el tipo no coincide
+                let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+                errores.push(err);
                 this.valores[nombre].valor = null;
             }
         } else if (valorAct.tipo === "string") {
@@ -99,10 +107,14 @@ updateVariable(nombre, valor, linea, columna) {
                 this.valores[nombre].tipo = "string";
             } else {
                 // Guardar null si el tipo no coincide
+                let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+                errores.push(err);
                 this.valores[nombre].valor = null;
             }
         } else {
             // Guardar null si el tipo no coincide
+            let err = new SemanticError(linea,columna,`Tipo de dato incorrecto para la variable ${nombre}`);
+            errores.push(err);
             this.valores[nombre].valor = null;
         }
 
