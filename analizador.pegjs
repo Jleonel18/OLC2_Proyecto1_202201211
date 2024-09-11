@@ -205,6 +205,7 @@ Unaria =   id: Identificador val2:( _ "[" _ v:Expresion _ "]" {return v})* "." o
           / "parseInt(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseInt', exp }) }
           / "parsefloat(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'parseFloat', exp }) }
           / "typeof" _ exp:Expresion _ { return crearNodo('unaria', {op: 'typeof', exp }) }
+          / "Object.keys(" _ exp:Expresion _ ")" { return crearNodo('unaria', {op: 'objkeys', exp }) }
           / id:Identificador "++" { return crearNodo('incremento', { id }) }
           / id:Identificador "--" { return crearNodo('decremento', { id }) }
           / id: Identificador _ pos:("[" _ val:Expresion _ "]" val2:( _ "[" _ v:Expresion _ "]" {return v})* {return [val, ...val2]}) {return crearNodo('referenciaVariable', {id, pos}) }

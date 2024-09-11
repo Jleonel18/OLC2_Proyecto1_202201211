@@ -546,6 +546,15 @@ export class InterpreterVisitor extends BaseVisitor{
                     errores.push(err);
                     return {valor: null, tipo: 'float'};
                 }
+            
+            case "objkeys":
+                const struct = this.entornoActual.getVariable(node.exp.id,node.location.start.line,node.location.start.column);
+                const arreglo = [];
+                const propiedades = struct.valor.struct.properties;
+                for(const propiedad in propiedades){
+                    arreglo.push(propiedad);
+                }
+                return {valor:arreglo, tipo:'string'};
                 
             default:
                 let err = new SemanticError(node.location.start.line,node.location.start.column,`Operador desconocido: ${node.op}`);
