@@ -1,0 +1,115 @@
+<programa> ::= <Declaracion>*
+
+<Declaracion> ::= <DeclStruct> | <VarDcl> | <DeclInstancia> | <Stmt> | <FuncDcl> | <Arreglo>
+
+<VarDcl> ::= <TipoDato> <Identificador> ["=" <Expresion>] ";" 
+           | "var" <Identificador> "=" <Expresion> ";"
+
+<TipoDato> ::= "int" | "float" | "string" | "boolean" | "char"
+
+<DeclStruct> ::= "struct" <Identificador> "{" <BloqueStruct>* "}" ";"
+
+<BloqueStruct> ::= (<TipoDato> | <Identificador>) <Identificador> ";"
+
+<DeclInstancia> ::= <Identificador> <Identificador> "=" <Expresion> ";"
+
+<RecStruct> ::= <Identificador> "{" <DatoStruc> ("," <DatoStruc>)* "}"
+
+<DatoStruc> ::= <Identificador> ":" <Expresion>
+
+<FuncDcl> ::= (<TipoDato> | "void") <Identificador> "(" [<Parametros>] ")" <Bloque>
+
+<Parametros> ::= <Parameters> ("," <Parameters>)*
+
+<Parameters> ::= <TipoDato> [<Dimensiones>] <Identificador>
+
+<Dimensiones> ::= "[" "]"
+
+<Stmt> ::= "System.out.println(" <Expresion> ("," <Expresion>)* ")" ";"
+         | <Bloque>
+         | "if" "(" <Expresion> ")" <Stmt> ["else" <Stmt>]
+         | "while" "(" <Expresion> ")" <Stmt>
+         | "for" "(" <ForInic> <Expresion> ";" <Expresion> ")" <Stmt>
+         | <Foreach>
+         | "switch" "(" <Expresion> ")" "{" <Cases>* [<Defaul>] "}"
+         | "break" ";"
+         | "continue" ";"
+         | "return" [<Expresion>] ";"
+         | <Expresion> ";"
+
+<Bloque> ::= "{" <Declaracion>* "}"
+
+<Foreach> ::= "for" "(" <TipoDato> <Identificador> ":" <Identificador> ")" <Stmt>
+
+<ForInic> ::= <VarDcl> | <Expresion> ";" | ";"
+
+<Cases> ::= "case" <Expresion> ":" <Declaracion>*
+
+<Defaul> ::= "default" ":" <Declaracion>*
+
+<Arreglo> ::= <TipoDato> "[" "]" <Identificador> "=" <Identificador> ("[" <Expresion> "]")* ";"
+            | <TipoDato> ("[" "]")+ <Identificador> "=" <Expresion> ";"
+            | <TipoDato> ("[" "]")+ <Identificador> "=" "new" <TipoDato> ("[" <Expresion> "]")+ ";"
+
+<Identificador> ::= [a-zA-Z_][a-zA-Z0-9_]*
+
+<Expresion> ::= <Asignacion>
+
+<Asignacion> ::= <Identificador> ("[" <Expresion> "]")+ "=" <Expresion>
+               | <Llamada> "=" <Asignacion>
+               | <Identificador> "+=" <Expresion>
+               | <Identificador> "-=" <Expresion>
+               | <Ternario>
+               | <Logico>
+
+<Ternario> ::= <Logico> "?" <Logico> ":" <Logico>
+
+<Logico> ::= <Igualacion> (("&&" | "||") <Igualacion>)*
+
+<Igualacion> ::= <Comparacion> (("!=" | "==") <Comparacion>)*
+
+<Comparacion> ::= <Suma> (("<=" | "<" | ">=" | ">") <Suma>)*
+
+<Suma> ::= <Multiplicacion> (("+" | "-") <Multiplicacion>)*
+
+<Multiplicacion> ::= <Unaria> (("*" | "/" | "%") <Unaria>)*
+
+<Unaria> ::= <Identificador> ("[" <Expresion> "]")* "." <FuncArreglo>
+           | <Identificador> ("[" <Expresion> "]")* "." "indexOf" "(" <Expresion> ")"
+           | "toString(" <Expresion> ")"
+           | "toUpperCase(" <Expresion> ")"
+           | "toLowerCase(" <Expresion> ")"
+           | "parseInt(" <Expresion> ")"
+           | "parsefloat(" <Expresion> ")"
+           | "typeof" <Expresion>
+           | "Object.keys(" <Expresion> ")"
+           | <Identificador> "++"
+           | <Identificador> "--"
+           | <Identificador> ("[" <Expresion> "]")+
+           | "-" <Unaria>
+           | "!" <Unaria>
+           | <Llamada>
+           | <Primitivos>
+
+<FuncArreglo> ::= "length" | "join()"
+
+<Llamada> ::= <Primitivos> (<LlamadaOp> | <GetOp>)*
+
+<LlamadaOp> ::= "(" [<Argumentos>] ")"
+
+<GetOp> ::= "." <Identificador>
+
+<Argumentos> ::= <Expresion> ("," <Expresion>)*
+
+<Primitivos> ::= [0-9]+ ("." [0-9]+)?
+               | "true" | "false"
+               | "'" <char> "'"
+               | <Cadena>
+               | "(" <Expresion> ")"
+               | "{" <Expresion> ("," <Expresion>)* "}"
+               | <RecStruct>
+               | <Identificador>
+
+<Cadena> ::= '"' <contenido> '"'
+
+<contenido> ::= ([^"] | '\n' | '\\' | '\"' | '\r' | '\t' | '\'')*
