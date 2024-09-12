@@ -10,6 +10,11 @@ import { Instancia } from "./instancia.js";
 
 export class InterpreterVisitor extends BaseVisitor{
 
+    static palabrasReservadas =['int','float','string','char','boolean','void','struct','return','if','else',
+        'while','for','break','continue','System','new','null','true','false','typeof','toString',
+        'toUpperCase','toLowerCase','parseInt','parsefloat','Object','switch','case','default',
+        'toString','return','var'];
+
 
     /**
      * 
@@ -601,81 +606,86 @@ export class InterpreterVisitor extends BaseVisitor{
 visitTipoVariable(node) {
     var tipoVar = node.tipo;
     const nombreVar = node.id;
+
+    if(InterpreterVisitor.palabrasReservadas.includes(nombreVar)){
+        let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una variable con el nombre de una palabra reservada`);
+        errores.push(err);
+    }else{
+        if (node.exp) {
+            const valor = node.exp.accept(this);
     
-    if (node.exp) {
-        const valor = node.exp.accept(this);
-
-        if (tipoVar == "int") {
-            if (tipoVar != valor.tipo) {
-                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+            if (tipoVar == "int") {
+                if (tipoVar != valor.tipo) {
+                    this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                    errores.push(err);
+    
+                }else{
+                    this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
+                }
+            } else if (tipoVar === "float") {
+                if (tipoVar !== valor.tipo && valor.tipo !== "int") {
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                    errores.push(err);
+                    this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                }else{
+                    this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
+                }
+            } else if (tipoVar === "string") {
+                if (tipoVar !== valor.tipo) {
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                    errores.push(err);
+                    this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                }else{
+                    this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
+                }
+            } else if (tipoVar === "boolean") {
+                if (tipoVar !== valor.tipo) {
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                    errores.push(err);
+                    this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                }else{
+                    this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
+                }
+            } else if (tipoVar === "char") {
+                if (tipoVar !== valor.tipo) {
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
+                    errores.push(err);
+                    this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+                }else{
+                    this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
+                }
+            } else {
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
                 errores.push(err);
-
-            }else{
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
-            }
-        } else if (tipoVar === "float") {
-            if (tipoVar !== valor.tipo && valor.tipo !== "int") {
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                errores.push(err);
                 this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
-            }else{
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
             }
-        } else if (tipoVar === "string") {
-            if (tipoVar !== valor.tipo) {
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                errores.push(err);
-                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
-            }else{
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
-            }
-        } else if (tipoVar === "boolean") {
-            if (tipoVar !== valor.tipo) {
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                errores.push(err);
-                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
-            }else{
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
-            }
-        } else if (tipoVar === "char") {
-            if (tipoVar !== valor.tipo) {
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo del valor no coincide con el tipo ${tipoVar}`);
-                errores.push(err);
-                this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
-            }else{
-                this.entornoActual.setVariable(tipoVar, nombreVar, valor.valor,node.location.start.line,node.location.start.column);
-            }
-        } else {
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
-            errores.push(err);
-            this.entornoActual.setVariable(tipoVar, nombreVar, null,node.location.start.line,node.location.start.column);
+            
+            return;
         }
-        
-        return;
+    
+        let valorPredeterminado;
+        switch (tipoVar) {
+            case "int":
+            case "float":
+                valorPredeterminado = null; // Valor predeterminado para int y float
+                break;
+            case "char":
+                valorPredeterminado = null; 
+                break;
+            case "string":
+                valorPredeterminado = null; 
+                break;
+            case "boolean":
+                valorPredeterminado = null; 
+                break;
+            default:
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
+                errores.push(err);
+        }
+    
+        this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado,node.location.start.line,node.location.start.column);
     }
-
-    let valorPredeterminado;
-    switch (tipoVar) {
-        case "int":
-        case "float":
-            valorPredeterminado = null; // Valor predeterminado para int y float
-            break;
-        case "char":
-            valorPredeterminado = null; 
-            break;
-        case "string":
-            valorPredeterminado = null; 
-            break;
-        case "boolean":
-            valorPredeterminado = null; 
-            break;
-        default:
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`Tipo de variable no válido`);
-            errores.push(err);
-    }
-
-    this.entornoActual.setVariable(tipoVar, nombreVar, valorPredeterminado,node.location.start.line,node.location.start.column);
 }
 
 
@@ -685,22 +695,27 @@ visitTipoVariable(node) {
 visitDeclaracionVariable(node) {
     const nombreVariable = node.id;
     
-    // Verificar si hay una expresión asignada
-    if (!node.exp) {
-        let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no tiene un valor asignado`);
-        errores.push(err);
-    }
-
-    // Evaluar la expresión para obtener el valor y el tipo
-    const valorVariable = node.exp.accept(this);
-    
-    // Asignar la variable con el tipo y valor deducidos
-    if(valorVariable.tipo == "null"){
-        let err = new SemanticError(node.location.start.line,node.location.start.column,`No se le pudo asignar un tipo a la variable ${nombreVariable}`);
+    if(InterpreterVisitor.palabrasReservadas.includes(nombreVariable)){
+        let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una variable con el nombre de una palabra reservada`);
         errores.push(err);
     }else{
-        this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor,node.location.start.line,node.location.start.column);
+        if (!node.exp) {
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${nombreVariable} no tiene un valor asignado`);
+            errores.push(err);
+        }
+    
+        // Evaluar la expresión para obtener el valor y el tipo
+        const valorVariable = node.exp.accept(this);
+        
+        // Asignar la variable con el tipo y valor deducidos
+        if(valorVariable.tipo == "null"){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se le pudo asignar un tipo a la variable ${nombreVariable}`);
+            errores.push(err);
+        }else{
+            this.entornoActual.setVariable(valorVariable.tipo, nombreVariable, valorVariable.valor,node.location.start.line,node.location.start.column);
+        }
     }
+    
 }
 
     
@@ -853,18 +868,25 @@ visitDeclaracionVariable(node) {
     visitStruct(node) {            
             const propiedades = {};
 
-            node.decl.forEach(d => {
+            if(InterpreterVisitor.palabrasReservadas.includes(node.id)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una estructura con el nombre de una palabra reservada`);
+                errores.push(err);
+            }else{
 
-                propiedades[d.id] = {
-                    tipo: d.tipo,
-                    valor: null
-                    
-                };
-            });
+                node.decl.forEach(d => {
 
-            const nuevoStruct = new Struct(node.id, propiedades);
+                    propiedades[d.id] = {
+                        tipo: d.tipo,
+                        valor: null
+                        
+                    };
+                });
+    
+                const nuevoStruct = new Struct(node.id, propiedades);
+    
+                this.entornoActual.setVariable(node.id,node.id, nuevoStruct,node.location.start.line,node.location.start.column);
 
-            this.entornoActual.setVariable(node.id,node.id, nuevoStruct,node.location.start.line,node.location.start.column);
+            }
     }
 
     /**
@@ -874,23 +896,28 @@ visitDeclaracionVariable(node) {
         const tipo = node.tipo;
             const id = node.id;
             const instancia = node.instancia.accept(this);
-            
-            const struct = this.entornoActual.getVariable(tipo,node.location.start.line,node.location.start.column).valor;
 
-
-            if(tipo != instancia.tipo) {
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de la instancia no coincide con el tipo de la estructura`);
+            if(InterpreterVisitor.palabrasReservadas.includes(id)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una instancia con el nombre de una palabra reservada`);
                 errores.push(err);
-            }
+            }else{
+                const struct = this.entornoActual.getVariable(tipo,node.location.start.line,node.location.start.column).valor;
 
-            if(!(struct instanceof Struct)){
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${tipo} no es una estructura`);
-                errores.push(err);
-            }
-            
-            this.entornoActual.setVariable(tipo, id, instancia.valor,node.location.start.line,node.location.start.column);
 
-            return struct.invocar(this, instancia.valor.struct.properties);
+                if(tipo != instancia.tipo) {
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de la instancia no coincide con el tipo de la estructura`);
+                    errores.push(err);
+                }
+
+                if(!(struct instanceof Struct)){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`La variable ${tipo} no es una estructura`);
+                    errores.push(err);
+                }
+                
+                this.entornoActual.setVariable(tipo, id, instancia.valor,node.location.start.line,node.location.start.column);
+
+                return struct.invocar(this, instancia.valor.struct.properties);
+            }
     }
 
     /**
@@ -1117,30 +1144,36 @@ visitAsignacion(node) {
         const tipo = node.tipo
         const id2 = node.id2
         const temporal = this.entornoActual.getVariable(id2, node.location.start.line, node.location.start.column)
-    
-        const entornoAnterior = this.entornoActual
-        this.entornoActual = new Entorno(entornoAnterior)
-    
-        if (!Array.isArray(temporal.valor)) {
-            let err = new SemanticError(node.location.start.line, node.location.start.column, `El id ${id2} no es un arreglo`)
+
+        if(InterpreterVisitor.palabrasReservadas.includes(id) || InterpreterVisitor.palabrasReservadas.includes(id2)){
+            let err = new SemanticError(node.location.start.line, node.location.start.column, `No se puede declarar una variable con el nombre de una palabra reservada`)
             errores.push(err)
-            return
+        }else{
+            const entornoAnterior = this.entornoActual
+            this.entornoActual = new Entorno(entornoAnterior)
+        
+            if (!Array.isArray(temporal.valor)) {
+                let err = new SemanticError(node.location.start.line, node.location.start.column, `El id ${id2} no es un arreglo`)
+                errores.push(err)
+                return
+            }
+        
+            if (tipo !== temporal.tipo) {
+                let err = new SemanticError(node.location.start.line, node.location.start.column, `El tipo de la variable ${id} no coincide con el tipo del arreglo`)
+                errores.push(err)
+                return
+            }
+        
+            temporal.valor.forEach(value => {
+                this.entornoActual.setVariable(temporal.tipo, id, value,node.location.start.line, node.location.start.column);
+        
+                node.stmt.accept(this);
+        
+                this.entornoActual.eliminarTemporal(id, node.location.start.line, node.location.start.column);
+            });
+            this.entornoActual = entornoAnterior
         }
-    
-        if (tipo !== temporal.tipo) {
-            let err = new SemanticError(node.location.start.line, node.location.start.column, `El tipo de la variable ${id} no coincide con el tipo del arreglo`)
-            errores.push(err)
-            return
-        }
-    
-        temporal.valor.forEach(value => {
-            this.entornoActual.setVariable(temporal.tipo, id, value,node.location.start.line, node.location.start.column);
-    
-            node.stmt.accept(this);
-    
-            this.entornoActual.eliminarTemporal(id, node.location.start.line, node.location.start.column);
-        });
-        this.entornoActual = entornoAnterior
+        
     }
 
     /**
@@ -1204,60 +1237,66 @@ visitAsignacion(node) {
         const tipo = node.tipo;
         const identificador = node.id;
         const vals = node.valores.accept(this);
-        if(node.tmn.length <= 1){
-            
-            let pivote = [];
 
-            vals.valor.forEach(v => {
-
-                if(Array.isArray(v.valor)){
-                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un valor primitivo`);
-                    errores.push(err);
-                }
-
-                if(tipo == "float" && vals.tipo == "int") {
-                    pivote.push(parseFloat(v));
-                }else if (tipo != vals.tipo){
-                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
-                    errores.push(err);
-                }else{
-                    pivote.push(v);
-                }
-
-            })
-
-            this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
-
+        if(InterpreterVisitor.palabrasReservadas.includes(identificador)){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una variable con el nombre de una palabra reservada`);
+            errores.push(err);
         }else{
-
-            const dimens = node.tmn.length;
-            let pivote = [];
-
-            vals.valor.forEach( v=>{
-
-                if(!Array.isArray(v)){
-                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un arreglo`);
+            if(node.tmn.length <= 1){
+            
+                let pivote = [];
+    
+                vals.valor.forEach(v => {
+    
+                    if(Array.isArray(v.valor)){
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un valor primitivo`);
+                        errores.push(err);
+                    }
+    
+                    if(tipo == "float" && vals.tipo == "int") {
+                        pivote.push(parseFloat(v));
+                    }else if (tipo != vals.tipo){
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                        errores.push(err);
+                    }else{
+                        pivote.push(v);
+                    }
+    
+                })
+    
+                this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
+    
+            }else{
+    
+                const dimens = node.tmn.length;
+                let pivote = [];
+    
+                vals.valor.forEach( v=>{
+    
+                    if(!Array.isArray(v)){
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a asignar no es un arreglo`);
+                        errores.push(err);
+                    }
+    
+                    if(tipo == "float" && vals.tipo == "int"){
+                        pivote.push(v);
+                    }else if(tipo != vals.tipo) {
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                        errores.push(err);
+                    }else{
+                        pivote.push(v);
+                    }
+    
+                })
+    
+                if(!this.comprobarDimensiones(pivote,dimens)){
+                    let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
                     errores.push(err);
                 }
-
-                if(tipo == "float" && vals.tipo == "int"){
-                    pivote.push(v);
-                }else if(tipo != vals.tipo) {
-                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
-                    errores.push(err);
-                }else{
-                    pivote.push(v);
-                }
-
-            })
-
-            if(!this.comprobarDimensiones(pivote,dimens)){
-                let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
-                errores.push(err);
+    
+                this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
+    
             }
-
-            this.entornoActual.setVariable(tipo, identificador, pivote,node.location.start.line,node.location.start.column);
-
         }
     }
 
@@ -1292,76 +1331,83 @@ visitAsignacion(node) {
         const id = node.id;
         const tamanos = node.tamanos.map(t => t.accept(this));
 
-        if(tipo1 != tipo2){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de los arreglos no coincide`);
+        if(InterpreterVisitor.palabrasReservadas.includes(id)){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una variable con el nombre de una palabra reservada`);
             errores.push(err);
-        }
-
-        if(dimens != tamanos.length){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
-            errores.push(err);
-        }
-
-        if(dimens <= 1 && tamanos.length <=1){
-
-            if(tamanos[0].tipo != "int" || tamanos[0].valor<0){
-                throw new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
-            }
-
-            let valorAsignar;
-            if(tipo1 == "int"){
-                valorAsignar = 0;
-            }else if(tipo1 == "float"){
-                valorAsignar = 0.0;
-            }else if(tipo1 == "string"){
-                valorAsignar = "";
-            }else if(tipo1 == "boolean"){
-                valorAsignar = true;
-            }else if(tipo1 == "char"){
-                valorAsignar = '';
-            }
-            
-            if(tipo1 == "boolean") valorAsignar = false;
-
-            let pivote = [];
-
-            for(let i = 0; i < tamanos[0].valor; i++){
-                pivote[i] = valorAsignar;
-            }
-            this.entornoActual.setVariable(tipo1,id,pivote,node.location.start.line,node.location.start.column);
-
         }else{
 
-            tamanos.forEach(t =>{
-                if(t.tipo != "int" || t.valor <0){
-                    let err = new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
-                    errores.push(err);
+            if(tipo1 != tipo2){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de los arreglos no coincide`);
+                errores.push(err);
+            }
+    
+            if(dimens != tamanos.length){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Las dimensiones del arreglo no coinciden`);
+                errores.push(err);
+            }
+    
+            if(dimens <= 1 && tamanos.length <=1){
+    
+                if(tamanos[0].tipo != "int" || tamanos[0].valor<0){
+                    throw new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
                 }
-            })
-
-            let matrizAsignar = (tamanos, i=0) =>{
-                if(i === tamanos.length){
-                    let valorAsignar;
-                    if(tipo1 == "int"){
-                        valorAsignar = 0;
-                    }else if(tipo1 == "float"){
-                        valorAsignar = 0.0;
-                    }else if(tipo1 == "string"){
-                        valorAsignar = "";
-                    }else if(tipo1 == "boolean"){
-                        valorAsignar = true;
-                    }else if(tipo1 == "char"){
-                        valorAsignar = '';
+    
+                let valorAsignar;
+                if(tipo1 == "int"){
+                    valorAsignar = 0;
+                }else if(tipo1 == "float"){
+                    valorAsignar = 0.0;
+                }else if(tipo1 == "string"){
+                    valorAsignar = "";
+                }else if(tipo1 == "boolean"){
+                    valorAsignar = true;
+                }else if(tipo1 == "char"){
+                    valorAsignar = '';
+                }
+                
+                if(tipo1 == "boolean") valorAsignar = false;
+    
+                let pivote = [];
+    
+                for(let i = 0; i < tamanos[0].valor; i++){
+                    pivote[i] = valorAsignar;
+                }
+                this.entornoActual.setVariable(tipo1,id,pivote,node.location.start.line,node.location.start.column);
+    
+            }else{
+    
+                tamanos.forEach(t =>{
+                    if(t.tipo != "int" || t.valor <0){
+                        let err = new SemanticError(node.location.start.line,node.location.start.column,`El tamaño del arreglo no es un entero positivo`);
+                        errores.push(err);
                     }
-                    if(tipo1 == "boolean") valorAsignar = false;
-                    return valorAsignar;
-                }
-                return new Array(tamanos[i].valor).fill().map(()=>
-                    matrizAsignar(tamanos,i+1)
-                );
-            };
-
-            this.entornoActual.setVariable(tipo1,id,matrizAsignar(tamanos),node.location.start.line,node.location.start.column);
+                })
+    
+                let matrizAsignar = (tamanos, i=0) =>{
+                    if(i === tamanos.length){
+                        let valorAsignar;
+                        if(tipo1 == "int"){
+                            valorAsignar = 0;
+                        }else if(tipo1 == "float"){
+                            valorAsignar = 0.0;
+                        }else if(tipo1 == "string"){
+                            valorAsignar = "";
+                        }else if(tipo1 == "boolean"){
+                            valorAsignar = true;
+                        }else if(tipo1 == "char"){
+                            valorAsignar = '';
+                        }
+                        if(tipo1 == "boolean") valorAsignar = false;
+                        return valorAsignar;
+                    }
+                    return new Array(tamanos[i].valor).fill().map(()=>
+                        matrizAsignar(tamanos,i+1)
+                    );
+                };
+    
+                this.entornoActual.setVariable(tipo1,id,matrizAsignar(tamanos),node.location.start.line,node.location.start.column);
+    
+            }
 
         }
 
@@ -1374,27 +1420,32 @@ visitAsignacion(node) {
         const tipo = node.tipo;
         const id = node.id;
 
-        const copiaArreglo = node.exp.accept(this);
-
-        if(!Array.isArray(copiaArreglo.valor)){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
-            errores.push(err);
-        }
-
-        if(Array.isArray(copiaArreglo.valor[0])){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo de arreglos`);
-            errores.push(err);
-        }
-
-        if(tipo == "float" && copiaArreglo.tipo == "int"){
-            const copiar = [...copiaArreglo.valor];
-            this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
-        }else if(tipo != copiaArreglo.tipo){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+        if(InterpreterVisitor.palabrasReservadas.includes(id)){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una variable con el nombre de una palabra reservada`);
             errores.push(err);
         }else{
-            const copiar = [...copiaArreglo.valor];
-            this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
+            const copiaArreglo = node.exp.accept(this);
+
+            if(!Array.isArray(copiaArreglo.valor)){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo`);
+                errores.push(err);
+            }
+
+            if(Array.isArray(copiaArreglo.valor[0])){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El valor a copiar no es un arreglo de arreglos`);
+                errores.push(err);
+            }
+
+            if(tipo == "float" && copiaArreglo.tipo == "int"){
+                const copiar = [...copiaArreglo.valor];
+                this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
+            }else if(tipo != copiaArreglo.tipo){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`El tipo de valor no coincide con el tipo del arreglo`);
+                errores.push(err);
+            }else{
+                const copiar = [...copiaArreglo.valor];
+                this.entornoActual.setVariable(tipo,id,copiar,node.location.start.line,node.location.start.column);
+            }
         }
 
     }
@@ -1435,18 +1486,23 @@ visitAsignacion(node) {
      */
     visitDeclFuncion(node) {
 
-        const noParams = node.params.map(param=> param.id);
-        const unico = new Set(noParams);
-
-        if(noParams.length != unico.size){
-            let err = new SemanticError(node.location.start.line,node.location.start.column,`Los parámetros de la función no son únicos`);
+        if(InterpreterVisitor.palabrasReservadas.includes(node.id)){
+            let err = new SemanticError(node.location.start.line,node.location.start.column,`No se puede declarar una función con el nombre de una palabra reservada`);
             errores.push(err);
+        }else{
+            const noParams = node.params.map(param=> param.id);
+            const unico = new Set(noParams);
+
+            if(noParams.length != unico.size){
+                let err = new SemanticError(node.location.start.line,node.location.start.column,`Los parámetros de la función no son únicos`);
+                errores.push(err);
+            }
+
+            const funcion = new Foreign(node, this.entornoActual);
+
+            console.log(this.entornoActual)
+            this.entornoActual.setVariable(node.tipo,node.id,funcion,node.location.start.line,node.location.start.column);
         }
-
-        const funcion = new Foreign(node, this.entornoActual);
-
-        console.log(this.entornoActual)
-        this.entornoActual.setVariable(node.tipo,node.id,funcion,node.location.start.line,node.location.start.column);
 
     }
 
