@@ -72,8 +72,8 @@ DatoStruc = id: Identificador _ ":" _ exp: Expresion _ { return { id, exp } }
 FuncDcl = tipo:(TipoDato/"void") _ id:Identificador _ "(" _ params:Parametros? _ ")" _ bloque: Bloque {return crearNodo('declFuncion', {tipo, id, params: params || [] , bloque})}
 
 Parametros = param1:Parameters params:("," _ param:Parameters {return param; })* {return [param1, ...params]; }
-Parameters = tipo:TipoDato dimen:Dimensiones? _ id:Identificador {return {tipo, id, dim:dimen || ""};}
-Dimensiones = "[" _ "]" {return text();}
+Parameters = tipo:(TipoDato/ Identificador) dimen:Dimensiones? _ id:Identificador {return {tipo, id, dim:dimen || ""};}
+Dimensiones = ("[" _ "]")* {return text();}
 
 Stmt = "System.out.println(" _ exp:Expresion _ exps: (","_ exps: Expresion {return exps})* _ ")" _ ";" { return crearNodo('print', { exp, exps }) }
     / Bloque
