@@ -80,6 +80,7 @@ export class Foreign extends Invocar{
         if(this.nodo.tipo != "void"){
             let err = new SemanticError(this.nodo.location.start.line, this.nodo.location.start.column, `La función ${this.nodo.id} debe retornar un valor`);
             errores.push(err);
+            return;
         }
 
         interprete.entornoActual = entornoAnteriorLlamada;

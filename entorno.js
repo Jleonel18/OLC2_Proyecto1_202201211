@@ -50,6 +50,87 @@ export class Entorno {
 updateVariable(nombre, valor, linea, columna) {
     const valorAct = this.valores[nombre];
 
+    if (valorAct !== undefined) {
+        const tipoActual = valorAct.tipo;
+        const tipoValor = valor.tipo;
+
+        // Función para actualizar el valor y tipo
+        const actualizarValor = (nuevoValor, nuevoTipo) => {
+            this.valores[nombre].valor = nuevoValor;
+            this.valores[nombre].tipo = nuevoTipo;
+            this.valores[nombre].linea = linea;
+            this.valores[nombre].columna = columna;
+        };
+
+        // Función para registrar error semántico
+        const registrarError = (mensaje) => {
+            let err = new SemanticError(linea, columna, mensaje);
+            errores.push(err);
+        };
+
+        // Verificaciones de tipo y actualizaciones
+        switch (tipoActual) {
+            case "int":
+                if (tipoValor === "int") {
+                    actualizarValor(valor.valor, "int");
+                } else {
+                    registrarError(`Tipo de dato incorrecto para la variable ${nombre}. Se esperaba int.`);
+                    actualizarValor(null, "int");
+                }
+                break;
+            case "float":
+                if (tipoValor === "float" || tipoValor === "int") {
+                    actualizarValor(valor.valor, "float"); // Permitir int -> float
+                } else {
+                    registrarError(`Tipo de dato incorrecto para la variable ${nombre}. Se esperaba float.`);
+                    actualizarValor(null, "float");
+                }
+                break;
+            case "boolean":
+                if (tipoValor === "boolean") {
+                    actualizarValor(valor.valor, "boolean");
+                } else {
+                    registrarError(`Tipo de dato incorrecto para la variable ${nombre}. Se esperaba boolean.`);
+                    actualizarValor(null, "boolean");
+                }
+                break;
+            case "char":
+                if (tipoValor === "char") {
+                    actualizarValor(valor.valor, "char");
+                } else {
+                    registrarError(`Tipo de dato incorrecto para la variable ${nombre}. Se esperaba char.`);
+                    actualizarValor(null, "char");
+                }
+                break;
+            case "string":
+                if (tipoValor === "string") {
+                    actualizarValor(valor.valor, "string");
+                } else {
+                    registrarError(`Tipo de dato incorrecto para la variable ${nombre}. Se esperaba string.`);
+                    actualizarValor(null, "string");
+                }
+                break;
+            default:
+                //registrarError(`Tipo de dato desconocido para la variable ${nombre}.`);
+                actualizarValor(valor.valor, tipoActual);
+                break;
+        }
+        return;
+    }
+
+    // Si no se encuentra en el entorno actual, buscar en el entorno padre
+    if (!valorAct && this.padre) {
+        this.padre.updateVariable(nombre, valor, linea, columna);
+        return;
+    }
+
+    let err = new SemanticError(linea, columna, `Variable ${nombre} no definida`);
+    errores.push(err);
+}
+/*
+updateVariable(nombre, valor, linea, columna) {
+    const valorAct = this.valores[nombre];
+
     if (valorAct != undefined) {
         if (valorAct.tipo === "int") {
             if (valor.tipo === "int") {
@@ -131,7 +212,7 @@ updateVariable(nombre, valor, linea, columna) {
 
     let err = new SemanticError(linea, columna, `Variable ${nombre} no definida`);
     errores.push(err);
-}
+}*/
 
 /**
  * @param {string} nombre

@@ -845,13 +845,16 @@ visitDeclaracionVariable(node) {
      * @type {BaseVisitor['visitPrint']}
      */
     visitPrint(node) {
-        const valor = node.exp.accept(this);
-        if(valor != undefined){
-            this.salida += valor.valor + ' ';
-        node.exps.forEach(exp => this.salida += exp.accept(this).valor + ' ');
-        this.salida += '\n';
-        }
-        
+        /*node.exps.forEach(exp => this.salida += exp.accept(this).valor + ' ');
+        this.salida += '\n';*/
+        const output = node.outputs.map(exp => {
+        const valor = exp.accept(this).valor;
+            if(valor != null){
+                return valor;
+            }
+            return "null";
+        });
+        this.salida += output.join(' ') + '\n';
     }
     
 

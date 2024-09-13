@@ -348,7 +348,7 @@ function peg$parse(input, options) {
   var peg$f20 = function(tipo, dimen, id) {return {tipo, id, dim:dimen || ""};};
   var peg$f21 = function() {return text();};
   var peg$f22 = function(exp, exps) {return exps};
-  var peg$f23 = function(exp, exps) { return crearNodo('print', { exp, exps }) };
+  var peg$f23 = function(exp, exps) { return crearNodo('print', {outputs: [exp, ...exps]}) };
   var peg$f24 = function(cond, stmtT, stmtElse) { return stmtElse };
   var peg$f25 = function(cond, stmtT, stmtElse) { return crearNodo('if', { cond, stmtT, stmtElse }) };
   var peg$f26 = function(cond, stmt) { return crearNodo('while', { cond, stmt }) };
@@ -1499,19 +1499,20 @@ return op
         s4 = peg$parse_();
         s5 = [];
         s6 = peg$currPos;
+        s7 = peg$parse_();
         if (input.charCodeAt(peg$currPos) === 44) {
-          s7 = peg$c11;
+          s8 = peg$c11;
           peg$currPos++;
         } else {
-          s7 = peg$FAILED;
+          s8 = peg$FAILED;
           if (peg$silentFails === 0) { peg$fail(peg$e11); }
         }
-        if (s7 !== peg$FAILED) {
-          s8 = peg$parse_();
-          s9 = peg$parseAsignacion();
-          if (s9 !== peg$FAILED) {
+        if (s8 !== peg$FAILED) {
+          s9 = peg$parse_();
+          s10 = peg$parseAsignacion();
+          if (s10 !== peg$FAILED) {
             peg$savedPos = s6;
-            s6 = peg$f22(s3, s9);
+            s6 = peg$f22(s3, s10);
           } else {
             peg$currPos = s6;
             s6 = peg$FAILED;
@@ -1523,19 +1524,20 @@ return op
         while (s6 !== peg$FAILED) {
           s5.push(s6);
           s6 = peg$currPos;
+          s7 = peg$parse_();
           if (input.charCodeAt(peg$currPos) === 44) {
-            s7 = peg$c11;
+            s8 = peg$c11;
             peg$currPos++;
           } else {
-            s7 = peg$FAILED;
+            s8 = peg$FAILED;
             if (peg$silentFails === 0) { peg$fail(peg$e11); }
           }
-          if (s7 !== peg$FAILED) {
-            s8 = peg$parse_();
-            s9 = peg$parseAsignacion();
-            if (s9 !== peg$FAILED) {
+          if (s8 !== peg$FAILED) {
+            s9 = peg$parse_();
+            s10 = peg$parseAsignacion();
+            if (s10 !== peg$FAILED) {
               peg$savedPos = s6;
-              s6 = peg$f22(s3, s9);
+              s6 = peg$f22(s3, s10);
             } else {
               peg$currPos = s6;
               s6 = peg$FAILED;
@@ -4404,9 +4406,6 @@ return op
                               }
                               if (s0 === peg$FAILED) {
                                 s0 = peg$parseLlamada();
-                                if (s0 === peg$FAILED) {
-                                  s0 = peg$parsePrimitivos();
-                                }
                               }
                             }
                           }
