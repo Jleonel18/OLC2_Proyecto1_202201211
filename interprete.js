@@ -1544,6 +1544,7 @@ visitAsignacion(node) {
     visitSwitch(node) {
         const condicion = node.exp.accept(this);
         let bandera = false;
+        const entornoAnterior = this.entornoActual;
 
         try {
             node.cases.forEach(caso => {
@@ -1584,6 +1585,7 @@ visitAsignacion(node) {
                 }
             }
         } catch (e) {
+            this.entornoActual = entornoAnterior;
             if (e instanceof BreakException) {
                 return; // Manejo de la salida del switch por un break
             }
